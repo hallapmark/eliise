@@ -37,7 +37,8 @@ eliise = Eliise(ESTDecompBrain(),
                 ESTPronounReflector())
 
 #send_cmdline_message(eliise, "Mulle nii meeldib, et me saime need sarnastelt toredatelt inimestelt!")
-send_cmdline_message(eliise, "Meenutasid mulle toredaid inimesi!")
+#send_cmdline_message(eliise, "Meenutasid mulle toredaid inimesi!")
+send_cmdline_message(eliise, "Ma usun, et ma olen ka selline, kes eriti ise midagi öelda ei julge!")
 
 # eliza = Eliise(ENGDecompBrain(),
 #                ENGTokenizer(),

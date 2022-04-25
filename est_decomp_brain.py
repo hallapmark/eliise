@@ -34,7 +34,10 @@ class ESTDecompBrain:
                         rf'(?:sarna{ne_regex}|samad?|samasugu{ne_regex})(.*)': # TODO: Replace test string
                                 ["TEST. REPLACE. Millele see sarnasus sinu arvates viitab? Kas seda, et see on {0}?", 
                                 '=sarnane'], # TODO: don't we need (.*)? Also, sama(d)?
-                        rf'(?:(?:meenuta{verb_endings_regex} mulle)|(?:ka selline))': # TODO: Test all these
+                        rf'meenuta{verb_endings_regex} mulle(.*)': # TODO: Test all these
+                                ['TEST. REPLACE. Kas see meenutab sulle {0}?', 
+                                '=sarnane'],
+                        'ka (?:selline|taoline)(.*)':
                                 ['TEST. REPLACE. Kas see meenutab sulle {0}?', 
                                 '=sarnane']},
                     5:  {'mäletan(.*)':

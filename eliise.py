@@ -48,13 +48,13 @@ class Eliise:
             try:
                 reflection = self._reflect_content(response.match)
             except IndexError:
-                print(f"Regex issue bleep bloop. {IndexError}")
-                #pass
+                pass
                 # TODO: In the future, we might want to LOG an error to a file or 
                 # remote server so that we can keep an eye on any inconsistencies in our 
                 # regex. We will get this error if we have indicated in our recomposition 
                 # rule that we expect to reflect something in the content, but the 
-                # decomposition rule does not capture a corresponding group.
+                # decomposition rule does not capture a corresponding group 
+                # (this would be an error in the decomp_brain script).
             else: 
                 response_str = response_str.format(reflection)
             finally:
@@ -83,8 +83,11 @@ class Eliise:
         for pattern, responses in rules:
             match = re.search(pattern, message, re.IGNORECASE)
             if match:
+                print("Match:")
                 print(match)
                 response = self._response_for_pattern(pattern, responses, response_memdict)
+                print("Response template:")
+                print(response)
                 return ELResponse(response, match)
         return None
     
@@ -113,6 +116,14 @@ class Eliise:
         else:
             # all_clauses = self._all_clauses(captured_content)
             # content_to_reflect = "".join(self._clauses_to_reflect(all_clauses))
+            if not captured_content:
+                # In some scenarios (e.g. in regex patterns including |) it is possible not 
+                # to have an error from Match.group() yet the returned content can still be None.
+                # TODO: Consider logging error (possibly need the user's permission for this)
+                print("No captured content!")
+                return ""
+            print("Captured content is:")
+            print(captured_content)
             words = self._tokenizer.tokenized(captured_content) # TODO: change to content_to_reflect
             reflection = self._pronoun_reflector.reflect_pronouns(words)
             reflection = self._verb_reflector.reflect_verbs(reflection)  
@@ -138,7 +149,6 @@ class Eliise:
         message = message.replace('.?', '?')
         message = message.replace('??', '?')
         message = message.replace(' .', '.')
-        message = message.replace('. ',' ')
         message = message.replace('.,',',')
         message = message.replace(' ,', ',')
         message = message.replace(' ?', '?')
