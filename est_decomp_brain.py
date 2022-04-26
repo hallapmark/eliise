@@ -74,13 +74,15 @@ class ESTDecompBrain:
                                 ['Tõesti, {0}?',
                                 'Kas sa oled kunagi ärkvel olles fantaseerinud {0}',
                                 'Kas sa oled varem unes näinud {0}',
-                                '=unenägu']},
+                                '=__unenägu__']},
                     3:  {r'\bkui\b(.*)':
                                 ['Kas sa pead tõenäoliseks, et {0}?',
                                 'Kas sa soovid, et {0}?',
                                 'Mida sina sellest arvad, kui {0}?',
                                 'No tõesti--kui {0}?'],
                         rf'unenä{self._gu_regex()}(.*)': # TODO: TEST
+                                ['=__unenägu__'],
+                        '__unenägu__': 
                                 ['Mida see unenägu sinu arvates tähendab? {0}',
                                 'Kas sa näed tihti unenägusid?',
                                 'Millised inimesed sinu unenägudes on?',
@@ -106,7 +108,7 @@ class ESTDecompBrain:
                                 'Palun jätka.',
                                 'Mida see sinu arvates tähendab?',
                                 'Kas sellistest asjadest rääkimine tekitab sinus tugevaid emotsioone?']}
-                    }
+                        }
 
 if __name__ == "__main__":
     decomp_brain = ESTDecompBrain()

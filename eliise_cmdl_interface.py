@@ -41,6 +41,7 @@ eliise = Eliise(ESTDecompBrain(),
 #send_cmdline_message(eliise, "Ma usun, et ma olen ka taoline, kes eriti ise midagi öelda ei julge!")
 # send_cmdline_message(eliise, "Minu unenägudes juhtub palju toredaid asju!")
 send_cmdline_message(eliise, "Minu unenägudesse – juhtub palju toredaid asju!")
+send_cmdline_message(eliise, "Minu unenägudesse – juhtub palju toredaid asju!")
 
 # eliza = Eliise(ENGDecompBrain(),
 #                ENGTokenizer(),

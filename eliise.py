@@ -1,3 +1,4 @@
+from doctest import run_docstring_examples
 from multiprocessing.sharedctypes import Value
 import re
 import random
@@ -41,7 +42,7 @@ class Eliise:
                    response_memdict: Dict[str, int]) -> str:
         """ Create a response by transforming the user's input message 
         according to a dictionary of rules."""
-        response = self._get_response_template(message, decomp_brain, response_memdict)
+        response = self._response_template_for_message(message, decomp_brain, response_memdict)
         response_str = response.response
         # We plug in a reflection of what the user said
         if response.match and '{0}' in response_str:
@@ -62,35 +63,41 @@ class Eliise:
              # TODO: Handle multiple reflections
         return response_str
 
-    def _get_response_template(self,
-                               message: str,
-                               decomp_brain: ELDecompBrain,
-                               response_memdict: Dict[str, int]) -> ELResponse:
+    def _response_template_for_message(self,
+                                       message: str,
+                                       decomp_brain: ELDecompBrain,
+                                       response_memdict: Dict[str, int]) -> ELResponse:
         # Some decomposition rules have precedence over others. Loop through
         # possible patterns, starting with the highest ranks, stop when match found.
         for rank in decomp_brain.ordered_ranks():
             rules = decomp_brain.eliise_rules().get(rank)
-            response = self._response_for_rank(message, rules.items(), response_memdict) if rules else None
-            # TODO: pick the leftmost response from the same rank?
+            response = self._response_for_rank(message, decomp_brain, rules.items(), response_memdict) if rules else None
             if response:
                 return response
-        return self._error_response()
+        return ELResponse(self._error_response(), None)
     
     def _response_for_rank(self,
                            message: str,
+                           decomp_brain: ELDecompBrain,
                            rules: ItemsView[str, List[str]],
                            response_memdict: Dict[str, int]) -> Optional[ELResponse]:
         for pattern, responses in rules:
             match = re.search(pattern, message, re.IGNORECASE)
-            if match:
-                print("Match:")
-                print(match)
-                response = self._response_for_pattern(pattern, responses, response_memdict)
-                print("Response template:")
-                print(response)
-                return ELResponse(response, match)
+            if not match:
+                continue
+            print()
+            print("Match:", match)
+            response_str = self._response_for_pattern(pattern, responses, response_memdict)
+            print("Response template:", response_str)
+            print("Pattern:", pattern)
+            if not response_str.startswith("="):
+                return ELResponse(response_str, match)
+            # We have a redirect request. Pick a response from the specified decomposition pattern
+            redir_response_str = self._response_for_key(response_str[1:], decomp_brain, response_memdict)
+            if redir_response_str:
+                return ELResponse(redir_response_str, match)
         return None
-    
+
     def _response_for_pattern(self,
                               pattern: str,
                               responses: List[str],
@@ -102,11 +109,26 @@ class Eliise:
         if i < len(responses):
             response_memdict[pattern] += 1
             return responses[i]
-        response_memdict[pattern] = 1 # We've used up all the responses, start over.
+        # We've used up all the responses, start over.
+        response_memdict[pattern] = 1 
         return responses[0]
+    
+    def _response_for_key(self,
+                          key: str,
+                          decomp_brain: ELDecompBrain,
+                          response_memdict: Dict[str, int]) -> Optional[str]:
+        """ This function looks for a response template based directly on a known key/pattern.
+        This enables cross-referencing between patterns. E.g. response n of pattern A might
+        be '=B' which is short for 'go pick a response from a related pattern B')"""
+        for rank in decomp_brain.ordered_ranks():
+            rules = decomp_brain.eliise_rules().get(rank)
+            if not rules or not key in rules:
+                continue
+            return self._response_for_pattern(key, rules[key], response_memdict)
+        return None
 
-    def _error_response(self) -> ELResponse:
-        return ELResponse("Bleep bloop, something went wrong. Please continue.", None)
+    def _error_response(self) -> str:
+        return "Bleep bloop, something went wrong. Please continue."
 
     def _reflect_content(self, regex_match: Match[str]) -> str:
         try:
@@ -117,8 +139,8 @@ class Eliise:
             # all_clauses = self._all_clauses(captured_content)
             # content_to_reflect = "".join(self._clauses_to_reflect(all_clauses))
             if not captured_content:
-                # In some scenarios (e.g. in regex patterns including |) it is possible not 
-                # to have an error from Match.group() yet the returned content can still be None.
+                # In some scenarios (e.g. in regex patterns including |) it is possible to get None
+                # even if there was no error from Match.group().
                 # TODO: Consider logging error (possibly need the user's permission for this)
                 print("No captured content!")
                 return ""
