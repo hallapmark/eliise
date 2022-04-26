@@ -17,21 +17,13 @@ class ESTDecompBrain:
     # Easy matching of common -ne adjectives in various cases.
     # 14 cases in sg. and pl. plus variants. We are ignoring comparatives for now.
     # declension type 10 / tüüpsõna 10
-    _ne_regex = '(?:ne\b|sed\b|se\b|ste\b|st\b|seid\b|st?esse\b|seisse|st?es\b|st?est\b|st?ele\b|st?el\b|st?elt\b|st?eks\b|st?eni\b|st?ena\b|st?eta\b|st?ega\b)'  
+    _ne_regex = '(?:ne|sed|se|ste|st|seid|st?esse|seisse|st?es|st?est|st?ele|st?el|st?elt|st?eks|st?eni|st?ena|st?eta|st?ega)'  
+        
+    # declension type 00
+    _mis_regex = '(?:s|lle|llede|da|llesse|lledesse|lles|lledes|llest|lledest|llele|lledele|l|llel|lledel|llelt|lledelt|lleks|lledeks|lleni|lledeni|llena|lledena|lleta|lledeta|llega|lledega)' 
     
     # declension type 18
-    def _gu_regex(self) -> str:
-        return rf'(?:{self._a_gu_sg_regex()}|{self._gu_pl_regex()})'
-    
-    # unenägu, -o, -gu, unenäkku e. unenäosse
-    def _a_gu_sg_regex(self) -> str:
-        endings = 'gu,o,gu,gusse,kku,osse,os,ost,ole,ol,lt,oni,ona,ota,oga'.split(",")
-        return "|".join([rf"{ending}\b" for ending in endings])
-
-    # unenäGU, unenäGUDE; käGU, käGUDE
-    def _gu_pl_regex(self) -> str:
-        endings = 'od,gude,gusid,gudesse,gudes,gudest,gudele,gudel,gudelt,gudeni'.split(",")
-        return "|".join([rf"{ending}\b" for ending in endings])
+    _gu_regex = '(?:gu|o|gu|gusse|kku|osse|os|ost|ole|ol|lt|oni|ona|ota|oga|od|gude|gusid|gudesse|gudes|gudest|gudele|gudel|gudelt|gudeni)'
 
     ## Regex patterns to match in the text, and response templates for each pattern ##
     # Use (?:) for creating a non-capturing group that will not be reflected back in the reply.
@@ -49,12 +41,11 @@ class ESTDecompBrain:
                                 'Mis seos siin sinu arvates on?',
                                 'Kas siin võiks tõesti mingi seos olla?',
                                 'Kuidas nii?'], 
-                        rf'(?:sarna{self._ne_regex}|samad?|samasugu{self._ne_regex})(.*)': # TODO: Replace test string
-                                ["TEST. REPLACE. Millele see sarnasus sinu arvates viitab? Kas seda, et see on {0}?", 
-                                '=sarnane'], # TODO: don't we need (.*)? Also, sama(d)?
+                        rf'(?:sarna{self._ne_regex}|samad?\b|samasugu{self._ne_regex})(.*)': # TODO: Replace test string
+                                ['=sarnane(.*)'], # TODO: don't we need (.*)? Also, sama(d)?
                         rf'meenuta{self._verb_endings_regex} mulle(.*)': # Replace 
                                 ['TEST. REPLACE. Kas see meenutab sulle {0}?', 
-                                '=sarnane'],
+                                '=sarnane(.*)'],
                         'ka (?:selline|taoline)(.*)':
                                 ['TEST. REPLACE. Kas see meenutab sulle {0}?', 
                                 '=sarnane']},
@@ -68,7 +59,7 @@ class ESTDecompBrain:
                                 ['Kas sa arvasid, et ma unustan {0}?',
                                 'Miks ma peaksin praegu mõtlema sellest {0}',
                                 'Mis sellest {0}?',
-                                '=mis',
+                                '=__mis__',
                                 'Sa mainisid {0}']},
                     4:  {'nägin unes(.*)':
                                 ['Tõesti, {0}?',
@@ -80,29 +71,41 @@ class ESTDecompBrain:
                                 'Kas sa soovid, et {0}?',
                                 'Mida sina sellest arvad, kui {0}?',
                                 'No tõesti--kui {0}?'],
-                        rf'unenä{self._gu_regex()}(.*)': # TODO: TEST
-                                ['=__unenägu__'],
-                        '__unenägu__': 
+                        rf'unenä{self._gu_regex}(.*)': # TODO: TEST
+                                ['=unenägu'],
+                        'unenägu': 
                                 ['Mida see unenägu sinu arvates tähendab? {0}',
                                 'Kas sa näed tihti unenägusid?',
                                 'Millised inimesed sinu unenägudes on?',
                                 'Kas sa ei leia, et see unenägu on kuidagi sinu murega seotud?']},
                     0:  {'kuidas(.*)': 
-                                ['=mis'], # TODO: add keyword 'mis'
+                                ['=__mis__'], 
                         'millal(.*)':
-                                ['=mis'],
+                                ['=__mis__'], 
                         'vabandust(.*)':
                                 ['Palun ära vabanda.',
                                 'Vabandada pole vaja.',
                                 'Mida sa vabandades tunned?',
                                 'Ma ütlesin sulle, et vabandada pole vaja.'],
-                         '(?:tahan|vajan)(.*)':
+                        '(?:tahan|vajan)(.*)':
                                 ['Kui sa saaksid {0}, siis mida see sulle tähendaks?',
                                 'Miks sa tahad {0}?',
                                 'Mis siis, kui sa juba õige pea saaksidki {0}?',
                                 'Mis siis, kui sa mitte kunagi ei saa {0}?',
                                 'Mida sulle tähendaks, kui sa saaksid {0}',
-                                'Kuidas {0} soovimine meie vestlusse puutub?']},
+                                'Kuidas {0} soovimine meie vestlusse puutub?'], 
+                        '__mis__':
+                                ['Miks sa seda küsid?',
+                                'Kas see teema paelub sind?',
+                                'Mida sa selle küsimusega tegelikult teada saada tahtsid?',
+                                'Kas sa mõtled tihti sellistele küsimustele?',
+                                'Milline vastus sulle kõige rohkem meelehead teeks?',
+                                'Mida sina arvad?',
+                                'Kui sa seda küsid, siis mis sul mõttesse tuleb?',
+                                'Kas sa oled selliseid küsimusi varem küsinud?',
+                                'Kas sa oled kelleltki veel küsinud?'],
+                        rf'\bmi{self._mis_regex}\b':
+                                ['=__mis__']},
                     -1: {'.*': 
                                 ['Ma pole kindel, kas ma mõistan täielikult, mida sa öelda tahad.',
                                 'Palun jätka.',
