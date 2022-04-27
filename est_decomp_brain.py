@@ -32,19 +32,21 @@ class ESTDecompBrain:
     # Use (?:) for creating a non-capturing group that will not be reflected back in the reply.
     def eliise_rules(self) -> Eliise_Rules:
         return {10:     {'sarnane(.*)':
-                                ['Mismoodi?', 'Mil moel sarnane?', 'Mil viisil?'
+                                ['Mismoodi?', 'Mil moel sarnane?',
                                 'Milles sarnasus seisneb?', 'Millist sarnasust sa siin näed?',
                                 'Millele see sarnasus sinu arvates viitab?',
                                 'Kas sul tulevad veel mingid seosed pähe?',
                                 'Mida see sarnasus sinu arvates tähendada võiks?',
                                 'Mis seos siin sinu arvates on?',
                                 'Kas siin võiks tõesti mingi seos olla?',
-                                'Kuidas nii?'], 
-                        rf'(?:sarna{self._ne_regex}|\bsamad?\b|samasugu{self._ne_regex})(.*)': # TODO: 'samasugune' should actually have its own rules
+                                'Kuidas nii?'],
+                        rf'sarna{self._ne_regex}(.*)': 
                                 ['=sarnane(.*)'], 
-                        rf'meenuta{self._verb_endings_regex} mulle(.*)': # Replace 
-                                ['TEST. REPLACE. Kas see meenutab sulle {0}?', 
-                                '=sarnane(.*)'],
+                        rf'(?:\bsamad?\b|samasugu{self._ne_regex})(.*)':
+                                ['Kuidas samasugune?', 
+                                'Mis seos siin sinu arvates on?'],
+                        rf'meenutad mulle(.*)': # note: this is in sg. 2 only as in the original Eliza
+                                ['=sarnane(.*)'],
                         r'ka (?:selline|taoline)\b(.*)':
                                 ['=sarnane(.*)']},
                     5:  {'mäletan(.*)':
@@ -55,14 +57,14 @@ class ESTDecompBrain:
                                 'Mis on seos minu ja {0} vahel?'],
                         'kas .*mäletad(.*)':
                                 ['Kas sa arvasid, et ma unustan {0}?',
-                                'Miks ma peaksin praegu mõtlema sellest {0}',
+                                'Miks ma peaksin praegu mõtlema sellest {0}?',
                                 'Mis sellest {0}?',
                                 '=__mis__',
                                 'Sa mainisid {0}']},
                     4:  {'nägin unes(.*)':
                                 ['Tõesti, {0}?',
-                                'Kas sa oled kunagi ärkvel olles fantaseerinud {0}',
-                                'Kas sa oled varem unes näinud {0}',
+                                'Kas sa oled kunagi ärkvel olles fantaseerinud {0}?',
+                                'Kas sa oled varem unes näinud {0}?',
                                 '=__unenägu__']},
                     3:  {r'\bkui\b(.*)':
                                 ['Kas sa pead tõenäoliseks, et {0}?',
@@ -72,7 +74,7 @@ class ESTDecompBrain:
                         rf'unenä{self._gu_regex}\b(.*)':
                                 ['=unenägu'],
                         'unenägu': 
-                                ['Mida see unenägu sinu arvates tähendab? {0}',
+                                ['Mida see unenägu sinu arvates tähendab?',
                                 'Kas sa näed tihti unenägusid?',
                                 'Millised inimesed sinu unenägudes on?',
                                 'Kas sa ei leia, et see unenägu on kuidagi sinu murega seotud?']},
@@ -98,7 +100,7 @@ class ESTDecompBrain:
                                 'Miks sa tahad {0}?',
                                 'Mis siis, kui sa juba õige pea saaksidki {0}?',
                                 'Mis siis, kui sa mitte kunagi ei saa {0}?',
-                                'Mida sulle tähendaks, kui sa saaksid {0}',
+                                'Mida sulle tähendaks, kui sa saaksid {0}?',
                                 'Kuidas {0} soovimine meie vestlusse puutub?'],
                         '__jah__':
                                 ['Sa tundud selles päris kindel.',

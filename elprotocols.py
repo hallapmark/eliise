@@ -23,7 +23,11 @@ class ELDecompBrain(Protocol):
         
     def ordered_ranks(self) -> List[int]: # type: ignore
         """ Returns a list of the possible ranks of the regex patterns, highest ranks first."""
-        
+
+class ELReflectedContentTrimmer(Protocol):
+    def shortened_content_to_reflect(self, content: str) -> str: # type: ignore
+        """ Returns a shortened string with some clauses cut."""
+
 ## Default implementations
 # Empty implementation of ELVerbReflector languages like English where we do not need to reflect 
 # verbs other than the copula.

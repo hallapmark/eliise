@@ -1,7 +1,6 @@
 from doctest import run_docstring_examples
 from multiprocessing.sharedctypes import Value
 import re
-import random
 from elprotocols import *
 from typing import List, Match, ItemsView, Optional
 
@@ -22,17 +21,20 @@ class Eliise:
                  decomp_brain: ELDecompBrain,
                  tokenizer: ELTokenizer,
                  verb_reflector: ELVerbReflector,
-                 pronoun_reflector: ELPronounReflector):
+                 pronoun_reflector: ELPronounReflector,
+                 content_trimmer: ELReflectedContentTrimmer):
         self._decomp_brain = decomp_brain
         self._tokenizer = tokenizer
         self._verb_reflector = verb_reflector
         self._pronoun_reflector = pronoun_reflector
+        self._content_trimmer = content_trimmer
         # { pattern: index of response to use for pattern next time }
         self._response_memdict: Dict[str, int] = {} 
 
     ## Public methods ##
     # Get a response from the chatbot
     def respond(self, message) -> str:
+        # TODO: Parametrize content_trimmer
         return self._transform(message, self._decomp_brain, self._response_memdict)
 
     ## Private methods ##
@@ -51,10 +53,9 @@ class Eliise:
             try:
                 reflection = self._reflect_content(response.match)
             except IndexError:
+                print("indexerror") # TODO: get rid of print statement
                 pass
-                # TODO: In the future, we might want to LOG an error to a file or 
-                # remote server so that we can keep an eye on any inconsistencies in our 
-                # regex. We will get this error if we have indicated in our recomposition 
+                # We will get this error if we have indicated in our recomposition 
                 # rule that we expect to reflect something in the content, but the 
                 # decomposition rule does not capture a corresponding group 
                 # (this would be an error in the decomp_brain script).
@@ -73,8 +74,11 @@ class Eliise:
         # possible patterns, starting with the highest ranks, stop when match found.
         for rank in decomp_brain.ordered_ranks():
             rules = decomp_brain.eliise_rules().get(rank)
-            response = self._response_for_rank(message, decomp_brain, rules.items(), response_memdict) if rules else None
-            if response:
+            response = self._response_for_rank(message,
+                                               decomp_brain,
+                                               rules.items(),
+                                               response_memdict) if rules else None
+            if response: 
                 return response
         return ELResponse(self._error_response(), None)
     
@@ -87,15 +91,14 @@ class Eliise:
             match = re.search(pattern, message, re.IGNORECASE)
             if not match:
                 continue
-            # print()
-            # print("Match:", match)
+            print("Match:", match)
             response_str = self._response_for_pattern(pattern, responses, response_memdict)
-            # print("Response template:", response_str)
-            # print("Pattern:", pattern)
+            print("Response template:", response_str)
+            print("Pattern:", pattern)
             if not response_str.startswith("="):
                 return ELResponse(response_str, match)
             # We have a redirect request. Pick a response from the specified decomposition pattern
-            redir_response_str = self._response_for_key(response_str[1:], decomp_brain, response_memdict)
+            redir_response_str = self._redir_response_for_key(response_str[1:], decomp_brain, response_memdict)
             if redir_response_str:
                 return ELResponse(redir_response_str, match)
         return None
@@ -115,18 +118,17 @@ class Eliise:
         response_memdict[pattern] = 1 
         return responses[0]
     
-    def _response_for_key(self,
-                          key: str,
-                          decomp_brain: ELDecompBrain,
-                          response_memdict: Dict[str, int]) -> Optional[str]:
-        """ This function looks for a response template based directly on a known key/pattern.
+    def _redir_response_for_key(self,
+                                key: str,
+                                decomp_brain: ELDecompBrain,
+                                response_memdict: Dict[str, int]) -> Optional[str]:
+        """ This function looks for a response template based on a known key/pattern.
         This enables cross-referencing between patterns. E.g. response n of pattern A might
         be '=B' which is short for 'go pick a response from a related pattern B')"""
         for rank in decomp_brain.ordered_ranks():
             rules = decomp_brain.eliise_rules().get(rank)
-            if not rules or not key in rules:
-                continue
-            return self._response_for_pattern(key, rules[key], response_memdict)
+            if rules and key in rules:
+                return self._response_for_pattern(key, rules[key], response_memdict)  
         return None
 
     def _error_response(self) -> str:
@@ -136,11 +138,12 @@ class Eliise:
         try:
             captured_content = regex_match.group(1)
         except IndexError:
+            print("Raising indexerror")
             raise
         else:
             # all_clauses = self._all_clauses(captured_content)
             # content_to_reflect = "".join(self._clauses_to_reflect(all_clauses))
-            if not captured_content:
+            if not captured_content or not isinstance(captured_content, str):
                 # In some scenarios (e.g. in regex patterns including |) it is possible to get None
                 # even if there was no error from Match.group().
                 # TODO: Consider logging error (possibly need the user's permission for this)
@@ -148,26 +151,12 @@ class Eliise:
                 return ""
             print("Captured content is:")
             print(captured_content)
-            words = self._tokenizer.tokenized(captured_content) # TODO: change to content_to_reflect
+            content_to_reflect = self._content_trimmer.shortened_content_to_reflect(captured_content)
+            words = self._tokenizer.tokenized(content_to_reflect)
             reflection = self._pronoun_reflector.reflect_pronouns(words)
-            reflection = self._verb_reflector.reflect_verbs(reflection)  
+            reflection = self._verb_reflector.reflect_verbs(reflection)
             return " ".join(reflection)
     
-    # def _all_clauses(self, message: str) -> List[str]:
-    #     # TODO: This is not a language-universal solution. Move to a protocol?
-    #     all_clauses = re.split('[,.]', message)
-    #     print(f'All clauses{all_clauses}')
-    #     return re.split('[,.]', message)
-    
-    # TODO: This is not working as expected
-    def _clauses_to_reflect(self, all_clauses: List[str]) -> List[str]:
-        # Todo: make a recursive function here?
-        clauses_to_reflect = [all_clauses[0]]
-        for i, clause in enumerate(clauses_to_reflect[1:]):
-            if len(clauses_to_reflect[i-1]) < 10: # ~2 words
-                clauses_to_reflect.append(clause)  
-        return clauses_to_reflect
-
     def _fix_punctuation(self, message: str) -> str:
         message = message.replace('?.', '.')
         message = message.replace('.?', '?')
