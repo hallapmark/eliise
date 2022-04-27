@@ -42,6 +42,8 @@ class Eliise:
                    response_memdict: Dict[str, int]) -> str:
         """ Create a response by transforming the user's input message 
         according to a dictionary of rules."""
+        print()
+        print(f"User: {message}")
         response = self._response_template_for_message(message, decomp_brain, response_memdict)
         response_str = response.response
         # We plug in a reflection of what the user said
@@ -85,11 +87,11 @@ class Eliise:
             match = re.search(pattern, message, re.IGNORECASE)
             if not match:
                 continue
-            print()
-            print("Match:", match)
+            # print()
+            # print("Match:", match)
             response_str = self._response_for_pattern(pattern, responses, response_memdict)
-            print("Response template:", response_str)
-            print("Pattern:", pattern)
+            # print("Response template:", response_str)
+            # print("Pattern:", pattern)
             if not response_str.startswith("="):
                 return ELResponse(response_str, match)
             # We have a redirect request. Pick a response from the specified decomposition pattern

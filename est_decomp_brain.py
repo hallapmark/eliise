@@ -14,23 +14,22 @@ class ESTDecompBrain:
     #rf'(?:(?:meenuta{verb_endings_regex} mulle)|(?:ka selline))'
     #send_cmdline_message(eliise, "Meenutasid mulle toredaid inimesi!")
 
-    # Easy matching of common -ne adjectives in various cases.
-    # 14 cases in sg. and pl. plus variants. We are ignoring comparatives for now.
-    # declension type 10 / tüüpsõna 10
-    _ne_regex = '(?:ne|sed|se|ste|st|seid|st?esse|seisse|st?es|st?est|st?ele|st?el|st?elt|st?eks|st?eni|st?ena|st?eta|st?ega)'  
-        
+    ## NOUN DECLENSION MATCHING ##
+    # 14 cases in sg. and pl. plus parallel variants. We are ignoring comparatives for now.
+
     # declension type 00
     _mis_regex = '(?:s|lle|llede|da|llesse|lledesse|lles|lledes|llest|lledest|llele|lledele|l|llel|lledel|llelt|lledelt|lleks|lledeks|lleni|lledeni|llena|lledena|lleta|lledeta|llega|lledega)' 
+    # declension type 10 / tüüpsõna 10
+    _ne_regex = '(?:ne|sed|se|ste|st|seid|st?esse|seisse|st?es|st?est|st?ele|st?el|st?elt|st?eks|st?eni|st?ena|st?eta|st?ega)'  
     
     # declension type 18
     _gu_regex = '(?:gu|o|gu|gusse|kku|osse|os|ost|ole|ol|lt|oni|ona|ota|oga|od|gude|gusid|gudesse|gudes|gudest|gudele|gudel|gudelt|gudeni)'
 
-    ## Regex patterns to match in the text, and response templates for each pattern ##
-    # Use (?:) for creating a non-capturing group that will not be reflected back in the reply.
-
     def ordered_ranks(self) -> List[int]:
         return sorted(self.eliise_rules().keys(), reverse = True)
 
+    ## Regex patterns to match in the text, and response templates for each pattern ##
+    # Use (?:) for creating a non-capturing group that will not be reflected back in the reply.
     def eliise_rules(self) -> Eliise_Rules:
         return {10:     {'sarnane(.*)':
                                 ['Mismoodi?', 'Mil moel sarnane?', 'Mil viisil?'
@@ -41,8 +40,8 @@ class ESTDecompBrain:
                                 'Mis seos siin sinu arvates on?',
                                 'Kas siin võiks tõesti mingi seos olla?',
                                 'Kuidas nii?'], 
-                        rf'(?:sarna{self._ne_regex}|samad?\b|samasugu{self._ne_regex})(.*)': # TODO: Replace test string
-                                ['=sarnane(.*)'], # TODO: don't we need (.*)? Also, sama(d)?
+                        rf'(?:sarna{self._ne_regex}|\bsamad?\b|samasugu{self._ne_regex})(.*)': # TODO: 'samasugune' should actually have its own rules
+                                ['=sarnane(.*)'], 
                         rf'meenuta{self._verb_endings_regex} mulle(.*)': # Replace 
                                 ['TEST. REPLACE. Kas see meenutab sulle {0}?', 
                                 '=sarnane(.*)'],
@@ -78,22 +77,38 @@ class ESTDecompBrain:
                                 'Kas sa näed tihti unenägusid?',
                                 'Millised inimesed sinu unenägudes on?',
                                 'Kas sa ei leia, et see unenägu on kuidagi sinu murega seotud?']},
-                    0:  {'kuidas(.*)': 
-                                ['=__mis__'], 
-                        'millal(.*)':
-                                ['=__mis__'], 
-                        'vabandust(.*)':
+                    0:  {'vabandust(.*)':
                                 ['Palun ära vabanda.',
                                 'Vabandada pole vaja.',
                                 'Mida sa vabandades tunned?',
                                 'Ma ütlesin sulle, et vabandada pole vaja.'],
+                        'kuidas(.*)': 
+                                ['=__mis__'], 
+                        'millal(.*)':
+                                ['=__mis__'],
+                        'kindlasti|kindlapeale':
+                                ['=__jah__'],
+                        r'(?:võib-?olla)|(?:võib olla)|(?:äkki\b)':
+                                ['Sa ei tundu selles päris kindel.',
+                                'Miks sa seda ebakindlalt ütled?',
+                                'Kas sa ei võiks olla positiivsem?',
+                                'Sa pole kindel.',
+                                'Kas sa siis ei tea?'],
                         '(?:tahan|vajan)(.*)':
                                 ['Kui sa saaksid {0}, siis mida see sulle tähendaks?',
                                 'Miks sa tahad {0}?',
                                 'Mis siis, kui sa juba õige pea saaksidki {0}?',
                                 'Mis siis, kui sa mitte kunagi ei saa {0}?',
                                 'Mida sulle tähendaks, kui sa saaksid {0}',
-                                'Kuidas {0} soovimine meie vestlusse puutub?'], 
+                                'Kuidas {0} soovimine meie vestlusse puutub?'],
+                        '__jah__':
+                                ['Sa tundud selles päris kindel.',
+                                'Sa oled selles veendunud.',
+                                'Või nii.',
+                                'Ma mõistan.'],
+                        r'\b(jah+|jaa+)\b':
+                                ['jahTEST TEST TEST TEST', 
+                                '=__jah__'], 
                         '__mis__':
                                 ['Miks sa seda küsid?',
                                 'Kas see teema paelub sind?',
@@ -117,5 +132,4 @@ if __name__ == "__main__":
     decomp_brain = ESTDecompBrain()
     #print(decomp_brain.ordered_ranks())
     print(decomp_brain.eliise_rules())
-    print(decomp_brain._gu_regex())
 

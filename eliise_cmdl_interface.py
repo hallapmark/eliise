@@ -37,16 +37,26 @@ eliise = Eliise(ESTDecompBrain(),
                 ESTPronounReflector())
 
 #send_cmdline_message(eliise, "Mulle nii meeldib, et me saime need sarnastelt toredatelt inimestelt!")
-send_cmdline_message(eliise, "Ohhoo – me hindame samasuguseid looduspilte!")
+# send_cmdline_message(eliise, "Ohhoo – me hindame samasuguseid looduspilte!")
 # send_cmdline_message(eliise, "Meenutasid mulle toredaid inimesi!")
 #send_cmdline_message(eliise, "Ma usun, et ma olen ka taoline, kes eriti ise midagi öelda ei julge!")
 # send_cmdline_message(eliise, "Minu unenägudes juhtub palju toredaid asju!")
 #send_cmdline_message(eliise, "Minu unenägudesse – juhtub palju toredaid asju!")
 #send_cmdline_message(eliise, "Minu unenägudesse – juhtub palju toredaid asju!")
-send_cmdline_message(eliise, "Aga millest see tuleb?")
-send_cmdline_message(eliise, "Aga milleni see kõik meid viib?")
-send_cmdline_message(eliise, "Ja millal nemad siis nii tähtsaks said?")
-
+# send_cmdline_message(eliise, "Aga millest see tuleb?")
+# send_cmdline_message(eliise, "Aga milleni see kõik meid viib?")
+# send_cmdline_message(eliise, "Ja millal nemad siis nii tähtsaks said?")
+# send_cmdline_message(eliise, "Kuidas sina sellest tead?")
+# send_cmdline_message(eliise, "Kindlasti arvad sa, et ma olen tobu.")
+# send_cmdline_message(eliise, "Tartu on täna kindlapeale vihmane!")
+send_cmdline_message(eliise, "Äkki ma ei olegi osav!")
+send_cmdline_message(eliise, "Seal võib olla inimene!")
+send_cmdline_message(eliise, "Võib-olla olla niisama?")
+send_cmdline_message(eliise, "Võibolla Hegeliga pole mõtet juttu puhuda?")
+# send_cmdline_message(eliise, "Jaa, nii see on")
+# send_cmdline_message(eliise, "Jaaaa, nii see on")
+# send_cmdline_message(eliise, "Jahhh, nii see on")
+# send_cmdline_message(eliise, "Jah, nii see on")
 
 # eliza = Eliise(ENGDecompBrain(),
 #                ENGTokenizer(),
