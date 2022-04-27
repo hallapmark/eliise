@@ -45,9 +45,8 @@ class ESTDecompBrain:
                         rf'meenuta{self._verb_endings_regex} mulle(.*)': # Replace 
                                 ['TEST. REPLACE. Kas see meenutab sulle {0}?', 
                                 '=sarnane(.*)'],
-                        'ka (?:selline|taoline)(.*)':
-                                ['TEST. REPLACE. Kas see meenutab sulle {0}?', 
-                                '=sarnane']},
+                        r'ka (?:selline|taoline)\b(.*)':
+                                ['=sarnane(.*)']},
                     5:  {'mäletan(.*)':
                                 ['Kas sa mõtled tihti {0}?',
                                 'Kas midagi tuleb veel mõttesse, kui sa mõtled {0}?',
@@ -70,7 +69,7 @@ class ESTDecompBrain:
                                 'Kas sa soovid, et {0}?',
                                 'Mida sina sellest arvad, kui {0}?',
                                 'No tõesti--kui {0}?'],
-                        rf'unenä{self._gu_regex}(.*)': # TODO: TEST
+                        rf'unenä{self._gu_regex}\b(.*)':
                                 ['=unenägu'],
                         'unenägu': 
                                 ['Mida see unenägu sinu arvates tähendab? {0}',
@@ -107,8 +106,7 @@ class ESTDecompBrain:
                                 'Või nii.',
                                 'Ma mõistan.'],
                         r'\b(jah+|jaa+)\b':
-                                ['jahTEST TEST TEST TEST', 
-                                '=__jah__'], 
+                                ['=__jah__'], 
                         '__mis__':
                                 ['Miks sa seda küsid?',
                                 'Kas see teema paelub sind?',
