@@ -29,7 +29,7 @@ class ELReflectedContentTrimmer(Protocol):
         """ Returns a shortened string with some clauses cut."""
 
 ## Default implementations
-# Empty implementation of ELVerbReflector languages like English where we do not need to reflect 
+# Empty implementation of ELVerbReflector for languages like English where we do not need to reflect 
 # verbs other than the copula.
 class ELDefaultVerbReflector:
     def reflect_verbs(self, word_list: List[str]) -> List[str]: 

@@ -20,8 +20,9 @@ class ESTDecompBrain:
     # declension type 00
     _mis_regex = '(?:s|lle|llede|da|llesse|lledesse|lles|lledes|llest|lledest|llele|lledele|l|llel|lledel|llelt|lledelt|lleks|lledeks|lleni|lledeni|llena|lledena|lleta|lledeta|llega|lledega)' 
     # declension type 10 / tüüpsõna 10
-    _ne_regex = '(?:ne|sed|se|ste|st|seid|st?esse|seisse|st?es|st?est|st?ele|st?el|st?elt|st?eks|st?eni|st?ena|st?eta|st?ega)'  
-    
+    _ne_regex_sg = '(?:ne|se|st|sesse|ses|sest|sele|sel|selt|seks|seni|sena|seta|sega)'
+    _ne_regex_pl = '(?:sed|ste|seid|stesse|seisse|stes|stest|stele|stel|stelt|steks|steni|stena|steta|stega)'
+
     # declension type 18
     _gu_regex = '(?:gu|o|gu|gusse|kku|osse|os|ost|ole|ol|lt|oni|ona|ota|oga|od|gude|gusid|gudesse|gudes|gudest|gudele|gudel|gudelt|gudeni)'
 
@@ -32,7 +33,7 @@ class ESTDecompBrain:
     # Use (?:) for creating a non-capturing group that will not be reflected back in the reply.
     def eliise_rules(self) -> Eliise_Rules:
         return {10:     {'sarnane(.*)':
-                                ['Mismoodi?', 'Mil moel sarnane?',
+                                ['Mil moel sarnane?', 'Mismoodi?',
                                 'Milles sarnasus seisneb?', 'Millist sarnasust sa siin näed?',
                                 'Millele see sarnasus sinu arvates viitab?',
                                 'Kas sul tulevad veel mingid seosed pähe?',
@@ -40,17 +41,22 @@ class ESTDecompBrain:
                                 'Mis seos siin sinu arvates on?',
                                 'Kas siin võiks tõesti mingi seos olla?',
                                 'Kuidas nii?'],
-                        rf'sarna{self._ne_regex}(.*)': 
+                        'sarnased(.*)':
+                                ['Mil moel sarnased?', 'Millele see sarnasus sinu arvates viitab?', 
+                                'Kas sul tulevad veel mingid seosed pähe?'],
+                        rf'sarna{self._ne_regex_sg}(.*)': 
                                 ['=sarnane(.*)'], 
-                        rf'(?:\bsamad?\b|samasugu{self._ne_regex})(.*)':
-                                ['Kuidas samasugune?', 
-                                'Mis seos siin sinu arvates on?'],
+                        rf'(?:\bsama\b|samasugu{self._ne_regex_sg})(.*)':
+                                ['Mil viisil samasugune?', '=sarnane(.*)'],
+                        rf'(?:\bsamad\b|samasugu{self._ne_regex_pl})(.*)':
+                                ['Mil viisil samasugused?',
+                                '=sarnased(.*)'], # TODO: re-test the sg and pl variants       
                         rf'meenutad mulle(.*)': # note: this is in sg. 2 only as in the original Eliza
                                 ['=sarnane(.*)'],
                         r'ka (?:selline|taoline)\b(.*)':
                                 ['=sarnane(.*)']},
                     5:  {'mäletan(.*)':
-                                ['Kas sa mõtled tihti {0}?',
+                                ['Kas sa mõtled tihti {0}[elative]?', # alternatively a tuple # Maybe check out if estnlk has a solution for this. But heuristics fine. Some sort of syntactic parsing or tagging in estnlk. Something to check whether the object is a noun phrase or a subordinate clause
                                 'Kas midagi tuleb veel mõttesse, kui sa mõtled {0}?',
                                 'Mis sul veel meelde tuleb?',
                                 'Mis sulle praeguses olukorras meenutab {0}?',
