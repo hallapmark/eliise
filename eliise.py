@@ -194,34 +194,52 @@ class Eliise:
         return "Bleep bloop, something went wrong. Please continue."
 
     def _reflect_content(self, response: ELResponse) -> ELResponse:
-        if not (response.match and '{0}' in response.response):
+        if not response.match:
             return response
+        processed_reflection = ""
+        for i in range(2): # The maximum number of captured groups in the user's message is 2
+            reflect_flag = f'{{{i}}}' # e.g. 'Why do you {0}?'
+            if reflect_flag not in response.response:
+                continue
+            captured_content = self._captured_group_content(response.match, i+1)
+            if not captured_content:
+                continue
+            processed_reflection = self._processed_reflection(captured_content)
+            # And for any given response template, we only ever define one captured group 
+            # to use. So if we found a match, stop looking for another one
+            break
+        if processed_reflection == "":
+            return response
+        response.response = re.sub(r'{[0-9]}',"{0}", response.response)
+        response.response = response.response.format(processed_reflection)
+        return response
+    
+    def _captured_group_content(self, match: Match, group_number: int) -> Optional[str]:
         try:
-            captured_content = response.match.group(1)
+            captured_content = match.group(group_number)
         except IndexError:
             print("indexerror") # TODO: get rid of print statement
-            return response
+            return None
             # We will get this error if we have indicated in our recomposition 
             # rule that we expect to reflect something in the content, but the 
             # decomposition rule does not capture a corresponding group 
             # (this would be an error in the decomp_brain script).
         else: 
-            if not captured_content or not isinstance(captured_content, str):
-                # In some scenarios (e.g. in regex patterns including |) it is possible to get None
-                # even if there was no error from Match.group().
-                print("No captured content!")
-                return response
-            print("Captured content is:")
-            print(captured_content)
-            content_to_reflect = self._content_trimmer.shortened_content_to_reflect(captured_content)
-            words = self._tokenizer.tokenized(content_to_reflect)
-            reflection = self._pronoun_reflector.reflect_pronouns(words)
-            reflection = self._verb_reflector.reflect_verbs(reflection)
-            reflection_str = " ".join(reflection)
-            response.response = response.response.format(reflection_str)
-            return response
-            # TODO: Handle multiple reflections
-    
+            if captured_content and isinstance(captured_content, str):
+                return captured_content
+            # In some scenarios (e.g. in regex patterns including |) it is possible to get None
+            # even if there was no error from Match.group().
+            print("No captured content!")
+            return None
+            
+
+    def _processed_reflection(self, captured_content: str) -> str:
+        content_to_reflect = self._content_trimmer.shortened_content_to_reflect(captured_content)
+        words = self._tokenizer.tokenized(content_to_reflect)
+        reflection = self._pronoun_reflector.reflect_pronouns(words)
+        reflection = self._verb_reflector.reflect_verbs(reflection)
+        return " ".join(reflection)
+        
     def _fix_punctuation(self, message: str) -> str:
         message = message.replace('?.', '.')
         message = message.replace('.?', '?')
