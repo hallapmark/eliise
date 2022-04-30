@@ -103,7 +103,17 @@ class ESTDecompBrain:
                                 ['Räägi mulle veel oma perekonnast.',
                                 'Kes su perekonnas veel {1}?',
                                 'Sinu {0}.',
-                                'Mis sul veel mõttesse tuleb, kui sa mõtled oma {0}?']},
+                                'Mis sul veel mõttesse tuleb, kui sa mõtled oma {0}?'],
+                        rf'\b(?:minu|mu)\b(.*)': # TODO: that-clause detector would be good here. Or maybe a verb detector?
+                                ['Sinu {0}?',
+                                'Miks sa ütled, et sinu {0}',
+                                'Kas see vihjab veel millelegi sinule kuuluvale?',
+                                'Kas sulle on tähtis, et sinu {0}'],
+                        f'{self.memory_responses_key}':
+                                ['Räägime lähemalt, miks sinu {0}.', # TODO: that-clause or verb detector needed here as well
+                                'Enne ütlesid sa, et {0}.',
+                                'Aga sinu {0}?',
+                                'Kas sel on midagi pistmist faktiga, et sinu {0}?']},
                     0:  {'vabandust(.*)':
                                 ['Palun ära vabanda.',
                                 'Vabandada pole vaja.',
@@ -151,12 +161,7 @@ class ESTDecompBrain:
                                 ['Ma pole kindel, kas ma mõistan täielikult, mida sa öelda tahad.',
                                 'Palun jätka.',
                                 'Mida see sinu arvates tähendab?',
-                                'Kas sellistest asjadest rääkimine tekitab sinus tugevaid emotsioone?'],
-                        f'{self.memory_responses_key}':
-                                ['Räägime lähemalt, miks sinu {0}.',
-                                'Enne ütlesid sa, et {0}.',
-                                'Aga sinu {0}?',
-                                'Kas sel on midagi pistmist faktiga, et sinu {0}?']}
+                                'Kas sellistest asjadest rääkimine tekitab sinus tugevaid emotsioone?']}
                         }
 
 if __name__ == "__main__":
