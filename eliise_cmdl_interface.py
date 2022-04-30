@@ -65,9 +65,12 @@ eliise = Eliise(ESTDecompBrain(),
 # send_cmdline_message(eliise, "Need on minu rohulibled!")
 # send_cmdline_message(eliise, "Kas sa mäletad, kuidas ma sind eelmisel aastal aitasin, et sul hea oleks?")
 # send_cmdline_message(eliise, "Appi, see on tore inimene!")
-send_cmdline_message(eliise, "Ma tean, et minu suur vend ei usu minu võimetesse.")
-send_cmdline_message(eliise, "Mu õde tahab, et ma enda eest rohkem vastutaksin.")
-send_cmdline_message(eliise, "Minu isa.")
+# send_cmdline_message(eliise, "Ma tean, et minu suur vend ei usu minu võimetesse.")
+# send_cmdline_message(eliise, "Mu õde tahab, et ma enda eest rohkem vastutaksin.")
+# send_cmdline_message(eliise, "Minu isa.")
+send_cmdline_message(eliise, "See on minu õun.")
+send_cmdline_message(eliise, "Appi, see on tore inimene!")
+send_cmdline_message(eliise, "See on minu kiivi.")
 
 # eliza = Eliise(ENGDecompBrain(),
 #                ENGTokenizer(),

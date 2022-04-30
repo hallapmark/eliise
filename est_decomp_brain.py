@@ -23,6 +23,7 @@ class ESTDecompBrain:
     ## Flags that trigger special processing rules
     memory_flag = '[memory]'
     elative_flag = '[elative_flag]'
+    check_verb_in_reflection_flag = '[check_verb_in_reflection_flag]'
 
     ## Keys that need to be referenced in the eliise.py class
     memory_responses_key = 'memory_responses'
@@ -104,9 +105,9 @@ class ESTDecompBrain:
                                 'Kes su perekonnas veel {1}?',
                                 'Sinu {0}.',
                                 'Mis sul veel mõttesse tuleb, kui sa mõtled oma {0}?'],
-                        rf'\b(?:minu|mu)\b(.*)': # TODO: that-clause detector would be good here. Or maybe a verb detector?
+                        rf'{self.check_verb_in_reflection_flag}\b(?:minu|mu)\b(.*)': # TODO: that-clause detector would be good here. Or maybe a verb detector?
                                 ['Sinu {0}?',
-                                'Miks sa ütled, et sinu {0}',
+                                'Miks sa ütled – sinu {0}',
                                 'Kas see vihjab veel millelegi sinule kuuluvale?',
                                 'Kas sulle on tähtis, et sinu {0}'],
                         f'{self.memory_responses_key}':

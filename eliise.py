@@ -12,18 +12,18 @@ class ELResponse:
     def __init__(self,
                  response: str,
                  match: Optional[Match[str]],
-                 decomp_options: Optional[Callable]):
+                 decomp_options: Optional[List[Callable]],
+                 recomp_options: Optional[List[Callable]]):
         self.response = response
         self.match = match
         self.decomp_options = decomp_options
+        self.recomp_options = recomp_options
 
 class PatternWithOptions(NamedTuple):
     """a docstring"""
     pattern: str
-
-    # map the inputs to the function blocks
-    # this is a roundabout way of creating a switch/match statement (unavailable in Py 3.8)
-    options: Optional[Callable]
+    decomp_options: Optional[List[Callable]]
+    recomp_options: Optional[List[Callable]] 
 
 class Eliise:
     def __init__(self,
@@ -77,7 +77,7 @@ class Eliise:
                                                response_index_for_pattern) if rules else None
             if response: 
                 return response
-        return ELResponse(self._error_response(), None, None)
+        return ELResponse(self._error_response(), None, None, None)
     
     def _response_for_rank(self,
                            message: str,
@@ -89,7 +89,7 @@ class Eliise:
             if not response:
                 continue
             # This response does not get used now, it gets stored in memory to be used later
-            if response.decomp_options == self._memory_handler:
+            if response.decomp_options and self._memory_handler in response.decomp_options:
                 print("Memory handler runs!")
                 self._memory_handler(response)
                 continue
@@ -102,9 +102,9 @@ class Eliise:
                               message: str,
                               decomp_brain: ELDecompBrain,
                               response_index_for_pattern: Dict[str, int]) -> Optional[ELResponse]:
-        pattern_with_options = self._cleaned_pattern_with_options(pattern, decomp_brain, self._memory_handler, self._elative_verb_handler)
+        pattern_with_options = self._cleaned_pattern_with_options(pattern, True, decomp_brain, self._memory_handler, self._elative_verb_handler)
         decomp_pattern = pattern_with_options.pattern
-        decomp_options = pattern_with_options.options
+        decomp_options = pattern_with_options.decomp_options
         match = re.search(decomp_pattern, message, re.IGNORECASE)
         if not match:
             return None
@@ -112,11 +112,11 @@ class Eliise:
         if pattern == decomp_brain.match_all_key:
             memorized_response = self._pop_from_memory()
             if memorized_response:
-                return ELResponse(memorized_response, match, None)
+                return ELResponse(memorized_response, match, None, None) # TODO: Check that last None
         response_str = self._next_response_for_pattern(decomp_pattern, responses, decomp_brain, response_index_for_pattern)
         print("Response template:", response_str)
         print("Pattern:", decomp_pattern)
-        response = ELResponse(response_str, match, decomp_options)
+        response = ELResponse(response_str, match, decomp_options, None)
         if not response_str.startswith("="):
             return self._reflect_content(response)
         # We have a redirect request. Pick a response from the specified decomposition pattern
@@ -136,9 +136,9 @@ class Eliise:
         if self._amnesiac:
             self._amnesiac = False
             return None
-        if len(stack) < 1:
+        if not stack:
             return None
-        # Get response from memory and prohibit memory use for next round
+        # Get response from memory and prohibit memory use for the next round
         self._amnesiac = True
         return stack.pop(0)
 
@@ -147,16 +147,22 @@ class Eliise:
     
     def _cleaned_pattern_with_options(self,
                                       pattern: str,
+                                      for_decomp: bool,
                                       decomp_brain: ELDecompBrain,
                                       memory_handler: Callable,
                                       elative_verb_handler: Callable) -> PatternWithOptions:
         options_switch = { decomp_brain.memory_flag : memory_handler, decomp_brain.elative_flag: elative_verb_handler }
+        options: List[Callable] = []
         for key in options_switch:
             if pattern.startswith(key):
                 pattern = pattern.removeprefix(key)
                 f = options_switch[key]
-                return PatternWithOptions(pattern, f)
-        return PatternWithOptions(pattern, None)
+                options.append(f)
+        if len(options) == 0:
+            return PatternWithOptions(pattern, None, None)
+        if for_decomp:
+            return PatternWithOptions(pattern, options, None)
+        return PatternWithOptions(pattern, None, options)
 
     def _next_response_for_pattern(self,
                                    pattern: str,
