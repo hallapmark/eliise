@@ -7,7 +7,7 @@ class ESTDecompBrain:
 
     # Matching of verbs when we do not care about the conjugation. Can only be used 
     # on verbs where the stem does not change. Not a complete list of all possible endings.
-    _verb_endings_regex = r'(?:d|sid|b|s|vad)' 
+    _verb_endings_regex = r'(?:d|sid|b|s|vad|ksin|ksid)' 
 
     ## NOUN DECLENSION MATCHING ##
     # 14 cases in sg. and pl. plus parallel variants. We are ignoring comparatives for now.
@@ -28,10 +28,14 @@ class ESTDecompBrain:
     memory_responses_key = 'memory_responses'
     match_all_key = '.*'
     
-    ## Noun equivalence classes/synonyms
+    ## Equivalence classes/synonyms
     def _family_synons_regex(self) -> str:
         # TODO: add recognition for all cases? 
         synons = ['perekond', 'ema', 'emme', 'mamps', 'mamma', 'isa', 'paps', 'õde', 'vend', 'abikaasa', 'lapsed', 'laps']
+        return rf'(?:{"|".join(synons)})'
+
+    def _belief_synons_regex(self) -> str:
+        synons = ['uskumus', r'\busk\b','tunnen', 'arvan', 'usun', 'soovin'] # But not 'tahan' (want), it has its own set of rules
         return rf'(?:{"|".join(synons)})'
 
     ## Interface
