@@ -12,13 +12,17 @@ class ESTDecompBrain:
     ## NOUN DECLENSION MATCHING ##
     # 14 cases in sg. and pl. plus parallel variants. We are ignoring comparatives for now.
 
-    # declension type 00
-    _mis_regex = '(?:s|lle|llede|da|llesse|lledesse|lles|lledes|llest|lledest|llele|lledele|l|llel|lledel|llelt|lledelt|lleks|lledeks|lleni|lledeni|llena|lledena|lleta|lledeta|llega|lledega)' 
-    # declension type 10 / tüüpsõna 10
-    _ne_regex_sg = '(?:ne|se|st|sesse|ses|sest|sele|sel|selt|seks|seni|sena|seta|sega)'
-    _ne_regex_pl = '(?:sed|ste|seid|stesse|seisse|stes|stest|stele|stel|stelt|steks|steni|stena|steta|stega)'
-    # declension type 18
-    _gu_regex = '(?:gu|o|gu|gusse|kku|osse|os|ost|ole|ol|lt|oni|ona|ota|oga|od|gude|gusid|gudesse|gudes|gudest|gudele|gudel|gudelt|gudeni)'
+    # declension type 00 / tüüpsõna 00
+    _decl_00_mis_regex = '(?:s|lle|llede|da|llesse|lledesse|lles|lledes|llest|lledest|llele|lledele|l|llel|lledel|llelt|lledelt|lleks|lledeks|lleni|lledeni|llena|lledena|lleta|lledeta|llega|lledega)' 
+    _decl_01e_regex_sg = '(?:i|i|it|isse|is|ist|ile|il|ilt|iks|ini|ina|ita|iga)'
+    _decl_01e_regex_pl = '(?:id|ite|eid|itesse|eisse|ites|eis|itest|eist|itele|eile|itel|eil|itelt|eilt|iteks|eiks|iteni|itena|iteta|itega)'
+    _decl_02_regex_sg = '(?:a|at|asse|as|ast|ale|al|alt|aks|ani|ana|ata|aga)'
+    _decl_02_regex_pl = '(?:ad|ate|aid|atesse|aisse|ates|ais|atest|aist|atele|aile|atel|ail|atelt|ailt|ateks|aiks|ateni|atena|ateta|atega)'
+    _decl_10_ne_regex_sg = '(?:ne|se|st|sesse|ses|sest|sele|sel|selt|seks|seni|sena|seta|sega)'
+    _decl_10_ne_regex_pl = '(?:sed|ste|seid|stesse|seisse|stes|stest|stele|stel|stelt|steks|steni|stena|steta|stega)'
+    _decl_18_gu_regex = '(?:gu|o|gu|gusse|kku|osse|os|ost|ole|ol|lt|oni|ona|ota|oga|od|gude|gusid|gudesse|gudes|gudest|gudele|gudel|gudelt|gudeni)'
+    _decl_20_regex_sg = '(?:i|e|e|esse|es|est|ele|el|elt|eks|eni|ena|eta|ega)'
+    _decl_20_regex_pl = '(?:ed|ede|esid|edesse|edes|edest|edele|edel|edelt|edeks|edeni|edena|edeta|edega)'
 
     ## Flags that trigger special processing rules
     memory_flag = '[memory]'
@@ -36,8 +40,11 @@ class ESTDecompBrain:
         return rf'(?:{"|".join(synons)})'
 
     def _belief_synons_regex(self) -> str:
-        synons = ['uskumus', r'\busk\b','tunnen', 'arvan', 'usun', 'soovin'] # But not 'tahan' (want), it has its own set of rules
+        synons = ['uskumus', r'\busk\b','tunnen', 'mõtlen', 'arvan', 'usun', 'soovin'] # But not 'tahan' (want), it has its own set of rules
         return rf'(?:{"|".join(synons)})'
+
+    def _sad_synons_regex(str) -> str:
+        synons = ['kurb', 'depressiivne'] # TODO: lisa veel
 
     ## Interface
     def ordered_ranks(self) -> List[int]:
@@ -46,7 +53,21 @@ class ESTDecompBrain:
     # Regex patterns to match in the text, and response templates for each pattern ##
     # Use (?:) for creating a non-capturing group that will not be reflected back in the reply.
     def eliise_rules(self) -> Eliise_Rules:
-        return {10:     {'sarnane(.*)':
+        return {50:     {rf'arvut(?:{self._decl_01e_regex_sg}|{self._decl_01e_regex_pl})': 
+                                ['=arvuti'],
+                        'arvuti': 
+                                ['Kas arvutid teevad sind murelikuks?',
+                                'Miks sa arvuteid mainid?',
+                                'Kuidas sinu arvates masinad sinu murega seotud on?',
+                                'Kas sa ei arva, et masinad võivad inimesi aidata?',
+                                'Mis sind masinate juures häirib?',
+                                'Mida sa masinatest arvad?'],
+                        rf'masin(?:{self._decl_02_regex_sg}|{self._decl_02_regex_sg})?': 
+                                ['=arvuti']},
+                15:     {rf'nim(?:{self._decl_20_regex_sg}|{self._decl_20_regex_pl})\b(.*)': 
+                                ['Nimed mind ei huvita.',
+                                'Ma juba ütlesin, et nimed mind ei huvita – palun jätka.']},
+                10:     {'sarnane(.*)':
                                 ['Mil moel sarnane?', 'Mismoodi?',
                                 'Milles sarnasus seisneb?', 'Millist sarnasust sa siin näed?',
                                 'Millele see sarnasus sinu arvates viitab?',
@@ -58,11 +79,11 @@ class ESTDecompBrain:
                         'sarnased(.*)':
                                 ['Mil moel sarnased?', 'Millele see sarnasus sinu arvates viitab?', 
                                 'Kas sul tulevad veel mingid seosed pähe?'],
-                        rf'sarna{self._ne_regex_sg}(.*)': 
+                        rf'sarna{self._decl_10_ne_regex_sg}(.*)': 
                                 ['=sarnane(.*)'], 
-                        rf'(?:\bsama\b|samasugu{self._ne_regex_sg})(.*)':
+                        rf'(?:\bsama\b|samasugu{self._decl_10_ne_regex_sg})(.*)':
                                 ['Mil viisil samasugune?', '=sarnane(.*)'],
-                        rf'(?:\bsamad\b|samasugu{self._ne_regex_pl})(.*)':
+                        rf'(?:\bsamad\b|samasugu{self._decl_10_ne_regex_pl})(.*)':
                                 ['Mil viisil samasugused?',
                                 '=sarnased(.*)'], # TODO: re-test the sg and pl variants       
                         rf'meenutad mulle(.*)': # note: this is in sg. 2 only as in the original Eliza
@@ -91,14 +112,31 @@ class ESTDecompBrain:
                                 'Kas sa soovid, et {0}?',
                                 'Mida sina sellest arvad, kui {0}?',
                                 'No tõesti--kui {0}?'],
-                        rf'unenä{self._gu_regex}\b(.*)':
-                                ['=unenägu'],
-                        'unenägu': 
+                        rf'unenä{self._decl_18_gu_regex}\b(.*)':
+                                ['=unenägu(.*)'],
+                        'unenägu(.*)': 
                                 ['Mida see unenägu sinu arvates tähendab?',
                                 'Kas sa näed tihti unenägusid?',
                                 'Millised inimesed sinu unenägudes on?',
                                 'Kas sa ei leia, et see unenägu on kuidagi sinu murega seotud?']},
-                    2:  {rf'{self.memory_flag}\b(?:minu|mu)\b(.*)':
+                    2:  {'kas ma olin)(.*)': 
+                                ['Mis siis oleks, kui sa olid {0}?',
+                                'Kas sa arvad, et olid {0}?',
+                                'Kas sa olid {0}',
+                                'Mida see tähendaks, kui sa olid {0}',
+                                'Millele viitab sinu arvates \"{0}\"?',
+                                '=__mis__'],
+                        'ma olin(.*)':
+                                ['Kas tõesti olid?',
+                                'Miks sa mulle nüüd ütled, et sa olid {0}',
+                                'Äkki ma juba teadsin, et sa olid {0}'],
+                        'kas sa olid(.*)': 
+                                ['Kas sulle meeldiks uskuda, et ma olin {0}?',
+                                'Mis sellele viitab, et ma olin {0}?',
+                                'Mida sina arvad?',
+                                'Võib-olla ma olin {0}.',
+                                'Mis siis oleks, kui ma olin {0}'],
+                        rf'{self.memory_flag}\b(?:minu|mu)\b(.*)':
                                 [f'={self.memory_responses_key}'],
                         rf'\b(?:minu|mu)\b.*({self._family_synons_regex()})(.*)': # 2 captured groups! 
                                 ['Räägi mulle veel oma perekonnast.',
@@ -124,14 +162,51 @@ class ESTDecompBrain:
                                 ['=__mis__'], 
                         'millal(.*)':
                                 ['=__mis__'],
-                        'kindlasti|kindlapeale':
+                        'kindlasti|kindlapeale(.*)':
                                 ['=__jah__'],
-                        r'(?:võib-?olla)|(?:võib olla)|(?:äkki\b)':
+                        r'(?:võib-?olla)|(?:võib olla)|(?:\bäkki\b)(.*)':
                                 ['Sa ei tundu selles päris kindel.',
                                 'Miks sa seda ebakindlalt ütled?',
                                 'Kas sa ei võiks olla positiivsem?',
                                 'Sa pole kindel.',
                                 'Kas sa siis ei tea?'],
+                        r'\b(jah+|jaa+)\b(.*)':
+                                ['=__jah__'],
+                        '__jah__':
+                                ['Sa tundud selles päris kindel.',
+                                'Sa oled selles veendunud.',
+                                'Või nii.',
+                                'Ma mõistan.'], 
+                        'english': ['=__võõrkeel__'],
+                        'francais': ['=__võõrkeel__'],
+                        'italiano': ['=__võõrkeel__'],
+                        'espanol': ['=__võõrkeel__'],
+                        '__võõrkeel__': ['Vabandust, aga ma räägin ainult eesti keelt.'],
+                        r'tere|tervitus|tervist|(?:\bterv\b)|(?:\bhei\b)(.*)':
+                                ['Tere. Palun räägi oma murest.'],
+                        r'((?:kas ma olen)|(?:olen ma\b))(.*)':
+                                ['Kas sa usud, et sa oled {0}?',
+                                'Kas sa tahaksid olla {0}',
+                                'Sa soovid, et ma ütleksin, et sa oled {0}',
+                                'Mida see sulle tähendaks, kui sa oleksid {0}',
+                                '=__mis__'],
+                        r'olen\b(.*)': ['Miks sa ütled "olen"?', 'Ma ei saa sellest aru.'],
+                        r'((?:kas sa oled)|(?:oled sa\b))(.*)':
+                                ['Miks sind huvitab, kas ma olen {0} või mitte?',
+                                'Kas sa eelistaksid, et ma ei oleks {0}?',
+                                'Võib-olla ma olen {0} sinu fantaasiates.',
+                                'Kas sa mõnikord mõtled, et ma olen {0}',
+                                '=__mis__'],
+                        r'\bon\b(.*)': 
+                                ['Kas sa arvasid, et nad ehk ei ole {0}?',
+                                'Kas sulle meeldiks, kui nad ei oleks {0}?',
+                                'Mis siis, kui nad ei oleks {0}?',
+                                'On võimalik, et nad on {0}.'],
+                        r'sinu\b(.*)':
+                                ['Miks sind huvitab minu {0}?',
+                                'Kuidas on sinu enda {0}?',
+                                'Kas sulle valmistab muret kellegi teise {0}?',
+                                'Tõesti, minu {0}?'],
                         '(?:tahan|vajan)(.*)':
                                 ['Kui sa saaksid {0}, siis mida see sulle tähendaks?',
                                 'Miks sa tahad {0}?',
@@ -139,13 +214,9 @@ class ESTDecompBrain:
                                 'Mis siis, kui sa mitte kunagi ei saa {0}?',
                                 'Mida sulle tähendaks, kui sa saaksid {0}?',
                                 'Kuidas {0} soovimine meie vestlusse puutub?'],
-                        '__jah__':
-                                ['Sa tundud selles päris kindel.',
-                                'Sa oled selles veendunud.',
-                                'Või nii.',
-                                'Ma mõistan.'],
-                        r'\b(jah+|jaa+)\b':
-                                ['=__jah__'], 
+                        'olen (?:kurb|depressivne)': ['TODO'], # TODO: siin pooleli
+                        rf'\bmi{self._decl_00_mis_regex}\b(.*)':
+                                ['=__mis__'],
                         '__mis__':
                                 ['Miks sa seda küsid?',
                                 'Kas see teema paelub sind?',
@@ -155,9 +226,7 @@ class ESTDecompBrain:
                                 'Mida sina arvad?',
                                 'Kui sa seda küsid, siis mis sul mõttesse tuleb?',
                                 'Kas sa oled selliseid küsimusi varem küsinud?',
-                                'Kas sa oled kelleltki veel küsinud?'],
-                        rf'\bmi{self._mis_regex}\b(.*)':
-                                ['=__mis__']},
+                                'Kas sa oled kelleltki veel küsinud?']},
                     -1: {f'{self.match_all_key}': 
                                 ['Ma pole kindel, kas ma mõistan täielikult, mida sa öelda tahad.',
                                 'Palun jätka.',
@@ -169,5 +238,3 @@ if __name__ == "__main__":
     decomp_brain = ESTDecompBrain()
     #print(decomp_brain.ordered_ranks())
     #print(decomp_brain.eliise_rules())
-    print(decomp_brain.family_synons_regex())
-
