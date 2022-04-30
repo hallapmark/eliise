@@ -28,6 +28,9 @@ class ESTDecompBrain:
 
     memory_flag = '[memory]'
     think_verb_flag = '[think_verb_flag]'
+    memory_responses_key = 'memory_responses'
+    match_all_key = '.*'
+
     def ordered_ranks(self) -> List[int]:
         return sorted(self.eliise_rules().keys(), reverse = True)
 
@@ -127,15 +130,20 @@ class ESTDecompBrain:
                                 'Kui sa seda küsid, siis mis sul mõttesse tuleb?',
                                 'Kas sa oled selliseid küsimusi varem küsinud?',
                                 'Kas sa oled kelleltki veel küsinud?'],
-                        rf'\bmi{self._mis_regex}\b':
+                        rf'\bmi{self._mis_regex}\b(.*)':
                                 ['=__mis__'],
-                        rf'{self.memory_flag}(?:minu|mu)\b':
-                                ['Mäletan sinu kasteuimas rohuliblesid.']},
-                    -1: {'.*': 
+                        rf'{self.memory_flag}\b(?:minu|mu)\b(.*)':
+                                [f'={self.memory_responses_key}']},
+                    -1: {f'{self.match_all_key}': 
                                 ['Ma pole kindel, kas ma mõistan täielikult, mida sa öelda tahad.',
                                 'Palun jätka.',
                                 'Mida see sinu arvates tähendab?',
-                                'Kas sellistest asjadest rääkimine tekitab sinus tugevaid emotsioone?']}
+                                'Kas sellistest asjadest rääkimine tekitab sinus tugevaid emotsioone?'],
+                        f'{self.memory_responses_key}':
+                                ['Räägime lähemalt, miks sinu {0}.',
+                                'Enne ütlesid sa, et {0}.',
+                                'Aga sinu {0}?',
+                                'Kas sel on midagi pistmist faktiga, et sinu {0}?']}
                         }
 
 if __name__ == "__main__":

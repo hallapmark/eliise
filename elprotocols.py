@@ -20,6 +20,9 @@ class ELPronounReflector(Protocol):
 class ELDecompBrain(Protocol):
     memory_flag: str
     think_verb_flag: str
+    memory_responses_key: str
+    match_all_key: str
+    
     def eliise_rules(self) -> Eliise_Rules: # type: ignore
         """ Returns ranked regex patterns to match in the text, and response templates for each pattern."""
         
