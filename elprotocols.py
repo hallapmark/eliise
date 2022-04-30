@@ -18,11 +18,14 @@ class ELPronounReflector(Protocol):
         """ Return a list of reflected pronouns (e.g. sg. 1 -> sg. 2)."""
 
 class ELDecompBrain(Protocol):
+    memory_flag: str
+    think_verb_flag: str
     def eliise_rules(self) -> Eliise_Rules: # type: ignore
         """ Returns ranked regex patterns to match in the text, and response templates for each pattern."""
         
     def ordered_ranks(self) -> List[int]: # type: ignore
         """ Returns a list of the possible ranks of the regex patterns, highest ranks first."""
+    
 
 class ELReflectedContentTrimmer(Protocol):
     def shortened_content_to_reflect(self, content: str) -> str: # type: ignore

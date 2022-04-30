@@ -26,6 +26,8 @@ class ESTDecompBrain:
     # declension type 18
     _gu_regex = '(?:gu|o|gu|gusse|kku|osse|os|ost|ole|ol|lt|oni|ona|ota|oga|od|gude|gusid|gudesse|gudes|gudest|gudele|gudel|gudelt|gudeni)'
 
+    memory_flag = '[memory]'
+    think_verb_flag = '[think_verb_flag]'
     def ordered_ranks(self) -> List[int]:
         return sorted(self.eliise_rules().keys(), reverse = True)
 
@@ -56,7 +58,7 @@ class ESTDecompBrain:
                         r'ka (?:selline|taoline)\b(.*)':
                                 ['=sarnane(.*)']},
                     5:  {'mäletan(.*)':
-                                ['Kas sa mõtled tihti {0}[elative]?', # alternatively a tuple # Maybe check out if estnlk has a solution for this. But heuristics fine. Some sort of syntactic parsing or tagging in estnlk. Something to check whether the object is a noun phrase or a subordinate clause
+                                [rf'{self.think_verb_flag}Kas sa mõtled tihti {0}?', # alternatively a tuple # Maybe check out if estnlk has a solution for this. But heuristics fine. Some sort of syntactic parsing or tagging in estnlk. Something to check whether the object is a noun phrase or a subordinate clause
                                 'Kas midagi tuleb veel mõttesse, kui sa mõtled {0}?',
                                 'Mis sul veel meelde tuleb?',
                                 'Mis sulle praeguses olukorras meenutab {0}?',
@@ -126,7 +128,9 @@ class ESTDecompBrain:
                                 'Kas sa oled selliseid küsimusi varem küsinud?',
                                 'Kas sa oled kelleltki veel küsinud?'],
                         rf'\bmi{self._mis_regex}\b':
-                                ['=__mis__']},
+                                ['=__mis__'],
+                        rf'{self.memory_flag}(?:minu|mu)\b':
+                                ['Mäletan sinu kasteuimas rohuliblesid.']},
                     -1: {'.*': 
                                 ['Ma pole kindel, kas ma mõistan täielikult, mida sa öelda tahad.',
                                 'Palun jätka.',

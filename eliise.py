@@ -1,8 +1,8 @@
-from doctest import run_docstring_examples
-from multiprocessing.sharedctypes import Value
+import __future__
 import re
 from elprotocols import *
 from typing import List, Match, ItemsView, Optional
+from typing import Tuple, NamedTuple, Callable
 
 # Eliise class
 # TODO Steve grumette eliza 1983
@@ -15,6 +15,14 @@ class ELResponse:
                  match: Optional[Match[str]]):
         self.response = response
         self.match = match
+
+class PatternWithOptions(NamedTuple):
+    """a docstring"""
+    pattern: str
+
+    # map the inputs to the function blocks
+    # this is a roundabout way of creating a switch/match statement (unavailable in Py 3.8)
+    options: Optional[Callable]
 
 class Eliise:
     def __init__(self,
@@ -29,47 +37,31 @@ class Eliise:
         self._pronoun_reflector = pronoun_reflector
         self._content_trimmer = content_trimmer
         # { pattern: index of response to use for pattern next time }
-        self._response_memdict: Dict[str, int] = {} 
+        self._response_index_for_pattern: Dict[str, int] = {} 
+        self._memorized_response_stack: List[str] = []
 
     ## Public methods ##
     # Get a response from the chatbot
     def respond(self, message) -> str:
         # TODO: Parametrize content_trimmer
-        return self._transform(message, self._decomp_brain, self._response_memdict)
+        return self._transform(message, self._decomp_brain, self._response_index_for_pattern)
 
     ## Private methods ##
     def _transform(self,
                    message: str,
                    decomp_brain: ELDecompBrain,
-                   response_memdict: Dict[str, int]) -> str:
+                   response_index_for_pattern: Dict[str, int]) -> str:
         """ Create a response by transforming the user's input message 
         according to a dictionary of rules."""
         print()
         print(f"User: {message}")
-        response = self._response_template_for_message(message, decomp_brain, response_memdict)
-        response_str = response.response
-        # We plug in a reflection of what the user said
-        if response.match and '{0}' in response_str:
-            try:
-                reflection = self._reflect_content(response.match)
-            except IndexError:
-                print("indexerror") # TODO: get rid of print statement
-                pass
-                # We will get this error if we have indicated in our recomposition 
-                # rule that we expect to reflect something in the content, but the 
-                # decomposition rule does not capture a corresponding group 
-                # (this would be an error in the decomp_brain script).
-            else: 
-                response_str = response_str.format(reflection)
-            finally:
-                response_str = self._fix_punctuation(response_str)
-             # TODO: Handle multiple reflections
-        return response_str
+        response = self._response_for_message(message, decomp_brain, response_index_for_pattern)
+        return self._fix_punctuation(response.response)
 
-    def _response_template_for_message(self,
-                                       message: str,
-                                       decomp_brain: ELDecompBrain,
-                                       response_memdict: Dict[str, int]) -> ELResponse:
+    def _response_for_message(self,
+                              message: str,
+                              decomp_brain: ELDecompBrain,
+                              response_index_for_pattern: Dict[str, int]) -> ELResponse:
         # Some decomposition rules have precedence over others. Loop through
         # possible patterns, starting with the highest ranks, stop when match found.
         for rank in decomp_brain.ordered_ranks():
@@ -77,7 +69,7 @@ class Eliise:
             response = self._response_for_rank(message,
                                                decomp_brain,
                                                rules.items(),
-                                               response_memdict) if rules else None
+                                               response_index_for_pattern) if rules else None
             if response: 
                 return response
         return ELResponse(self._error_response(), None)
@@ -86,76 +78,121 @@ class Eliise:
                            message: str,
                            decomp_brain: ELDecompBrain,
                            rules: ItemsView[str, List[str]],
-                           response_memdict: Dict[str, int]) -> Optional[ELResponse]:
+                           response_index_for_pattern: Dict[str, int]) -> Optional[ELResponse]:
         for pattern, responses in rules:
-            match = re.search(pattern, message, re.IGNORECASE)
-            if not match:
+            pattern_with_options = self._cleaned_pattern_with_options(pattern, decomp_brain, self._memory_handler, self._think_verb_handler)
+            decomp_pattern = pattern_with_options.pattern
+            decomp_options = pattern_with_options.options
+            response = self._response_for_pattern(decomp_pattern, responses, message, decomp_brain, response_index_for_pattern)
+            if not response:
                 continue
-            print("Match:", match)
-            response_str = self._response_for_pattern(pattern, responses, response_memdict)
-            print("Response template:", response_str)
-            print("Pattern:", pattern)
-            if not response_str.startswith("="):
-                return ELResponse(response_str, match)
-            # We have a redirect request. Pick a response from the specified decomposition pattern
-            redir_response_str = self._redir_response_for_key(response_str[1:], decomp_brain, response_memdict)
-            if redir_response_str:
-                return ELResponse(redir_response_str, match)
+            # This response does not get used now, it gets stored in memory to be used later
+            if decomp_options == self._memory_handler:
+                self._memory_handler(response)
+                continue
+            return response
         return None
 
     def _response_for_pattern(self,
                               pattern: str,
                               responses: List[str],
-                              response_memdict: Dict[str, int]) -> str:
-        if not pattern in response_memdict:
-            response_memdict[pattern] = 1 # Response to use next time pattern is met
+                              message: str,
+                              decomp_brain: ELDecompBrain,
+                              response_index_for_pattern: Dict[str, int]) -> Optional[ELResponse]:
+        match = re.search(pattern, message, re.IGNORECASE)
+        if not match:
+            return None
+        print("Match:", match)
+        response_str = self._next_response_for_pattern(pattern, responses, response_index_for_pattern)
+        print("Response template:", response_str)
+        print("Pattern:", pattern)
+        response = ELResponse(response_str, match)
+        if not response_str.startswith("="):
+            return self._reflect_content(response)
+        # We have a redirect request. Pick a response from the specified decomposition pattern
+        redir_response_str = self._redir_response_for_key(response_str[1:], decomp_brain, response_index_for_pattern)
+        if redir_response_str:
+            response.response = redir_response_str
+            return self._reflect_content(response)
+        return None
+        
+    def _memory_handler(self, response: ELResponse):
+        self._memorized_response_stack.append(response.response)
+
+    def _think_verb_handler(self, response: ELResponse):
+        pass
+    
+    def _cleaned_pattern_with_options(self,
+                                      pattern: str,
+                                      decomp_brain: ELDecompBrain,
+                                      memory_handler: Callable,
+                                      think_verb_handler: Callable) -> PatternWithOptions:
+        options_switch = { decomp_brain.memory_flag : memory_handler, decomp_brain.think_verb_flag: think_verb_handler }
+        for key in options_switch:
+            if pattern.startswith(key):
+                pattern = pattern.removeprefix(key)
+                f = options_switch[key]
+                return PatternWithOptions(pattern, f)
+        return PatternWithOptions(pattern, None)
+
+    def _next_response_for_pattern(self,
+                              pattern: str,
+                              responses: List[str],
+                              response_index_for_pattern: Dict[str, int]) -> str:
+        if not pattern in response_index_for_pattern:
+            response_index_for_pattern[pattern] = 1 # Response to use next time pattern is met
             return responses[0]
-        i = response_memdict[pattern]
+        i = response_index_for_pattern[pattern]
         if i < len(responses):
-            response_memdict[pattern] += 1
+            response_index_for_pattern[pattern] += 1
             return responses[i]
         # We've used up all the responses, start over.
-        response_memdict[pattern] = 1 
+        response_index_for_pattern[pattern] = 1 
         return responses[0]
     
     def _redir_response_for_key(self,
                                 key: str,
                                 decomp_brain: ELDecompBrain,
-                                response_memdict: Dict[str, int]) -> Optional[str]:
+                                response_index_for_pattern: Dict[str, int]) -> Optional[str]:
         """ This function looks for a response template based on a known key/pattern.
         This enables cross-referencing between patterns. E.g. response n of pattern A might
         be '=B' which is short for 'go pick a response from a related pattern B')"""
         for rank in decomp_brain.ordered_ranks():
             rules = decomp_brain.eliise_rules().get(rank)
             if rules and key in rules:
-                return self._response_for_pattern(key, rules[key], response_memdict)  
+                return self._next_response_for_pattern(key, rules[key], response_index_for_pattern)  
         return None
 
     def _error_response(self) -> str:
         return "Bleep bloop, something went wrong. Please continue."
 
-    def _reflect_content(self, regex_match: Match[str]) -> str:
+    def _reflect_content(self, response: ELResponse) -> ELResponse:
+        if not (response.match and '{0}' in response.response):
+            return response
         try:
-            captured_content = regex_match.group(1)
+            captured_content = response.match.group(1)
         except IndexError:
-            print("Raising indexerror")
-            raise
-        else:
-            # all_clauses = self._all_clauses(captured_content)
-            # content_to_reflect = "".join(self._clauses_to_reflect(all_clauses))
+            print("indexerror") # TODO: get rid of print statement
+            return response
+            # We will get this error if we have indicated in our recomposition 
+            # rule that we expect to reflect something in the content, but the 
+            # decomposition rule does not capture a corresponding group 
+            # (this would be an error in the decomp_brain script).
+        else: 
             if not captured_content or not isinstance(captured_content, str):
                 # In some scenarios (e.g. in regex patterns including |) it is possible to get None
                 # even if there was no error from Match.group().
-                # TODO: Consider logging error (possibly need the user's permission for this)
                 print("No captured content!")
-                return ""
+                return response
             print("Captured content is:")
             print(captured_content)
             content_to_reflect = self._content_trimmer.shortened_content_to_reflect(captured_content)
             words = self._tokenizer.tokenized(content_to_reflect)
             reflection = self._pronoun_reflector.reflect_pronouns(words)
             reflection = self._verb_reflector.reflect_verbs(reflection)
-            return " ".join(reflection)
+            response.response = " ".join(reflection)
+            return response
+            # TODO: Handle multiple reflections
     
     def _fix_punctuation(self, message: str) -> str:
         message = message.replace('?.', '.')
