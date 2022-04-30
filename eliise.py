@@ -102,7 +102,7 @@ class Eliise:
                               message: str,
                               decomp_brain: ELDecompBrain,
                               response_index_for_pattern: Dict[str, int]) -> Optional[ELResponse]:
-        pattern_with_options = self._cleaned_pattern_with_options(pattern, decomp_brain, self._memory_handler, self._think_verb_handler)
+        pattern_with_options = self._cleaned_pattern_with_options(pattern, decomp_brain, self._memory_handler, self._elative_verb_handler)
         decomp_pattern = pattern_with_options.pattern
         decomp_options = pattern_with_options.options
         match = re.search(decomp_pattern, message, re.IGNORECASE)
@@ -142,15 +142,15 @@ class Eliise:
         self._amnesiac = True
         return stack.pop(0)
 
-    def _think_verb_handler(self, response: ELResponse):
+    def _elative_verb_handler(self, response: ELResponse):
         pass
     
     def _cleaned_pattern_with_options(self,
                                       pattern: str,
                                       decomp_brain: ELDecompBrain,
                                       memory_handler: Callable,
-                                      think_verb_handler: Callable) -> PatternWithOptions:
-        options_switch = { decomp_brain.memory_flag : memory_handler, decomp_brain.think_verb_flag: think_verb_handler }
+                                      elative_verb_handler: Callable) -> PatternWithOptions:
+        options_switch = { decomp_brain.memory_flag : memory_handler, decomp_brain.elative_flag: elative_verb_handler }
         for key in options_switch:
             if pattern.startswith(key):
                 pattern = pattern.removeprefix(key)

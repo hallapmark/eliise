@@ -19,7 +19,7 @@ class ELPronounReflector(Protocol):
 
 class ELDecompBrain(Protocol):
     memory_flag: str
-    think_verb_flag: str
+    elative_flag: str
     memory_responses_key: str
     match_all_key: str
     

@@ -5,14 +5,9 @@ class ESTDecompBrain:
 
     ## Regex helpers ##
 
-    # Easy matching of verbs when we do not care about the conjugation. Can only be used 
-    # on verbs where the stem does not change.
+    # Matching of verbs when we do not care about the conjugation. Can only be used 
+    # on verbs where the stem does not change. Not a complete list of all possible endings.
     _verb_endings_regex = r'(?:d|sid|b|s|vad)' 
-
-    """ Use these to test 'IndexError: no such group' error"""
-    #verb_endings_regex = r'(?:d|sid|b|s|vad)'
-    #rf'(?:(?:meenuta{verb_endings_regex} mulle)|(?:ka selline))'
-    #send_cmdline_message(eliise, "Meenutasid mulle toredaid inimesi!")
 
     ## NOUN DECLENSION MATCHING ##
     # 14 cases in sg. and pl. plus parallel variants. We are ignoring comparatives for now.
@@ -22,19 +17,28 @@ class ESTDecompBrain:
     # declension type 10 / tüüpsõna 10
     _ne_regex_sg = '(?:ne|se|st|sesse|ses|sest|sele|sel|selt|seks|seni|sena|seta|sega)'
     _ne_regex_pl = '(?:sed|ste|seid|stesse|seisse|stes|stest|stele|stel|stelt|steks|steni|stena|steta|stega)'
-
     # declension type 18
     _gu_regex = '(?:gu|o|gu|gusse|kku|osse|os|ost|ole|ol|lt|oni|ona|ota|oga|od|gude|gusid|gudesse|gudes|gudest|gudele|gudel|gudelt|gudeni)'
 
+    ## Flags that trigger special processing rules
     memory_flag = '[memory]'
-    think_verb_flag = '[think_verb_flag]'
+    elative_flag = '[elative_flag]'
+
+    ## Keys that need to be referenced in the eliise.py class
     memory_responses_key = 'memory_responses'
     match_all_key = '.*'
+    
+    ## Noun equivalence classes/synonyms
+    def _family_synons_regex(self) -> str:
+        # TODO: add recognition for all cases? 
+        synons = ['perekond', 'ema', 'emme', 'mamps', 'mamma', 'isa', 'paps', 'õde', 'vend', 'abikaasa', 'lapsed', 'laps']
+        return rf'(?:{"|".join(synons)})'
 
+    ## Interface
     def ordered_ranks(self) -> List[int]:
         return sorted(self.eliise_rules().keys(), reverse = True)
 
-    ## Regex patterns to match in the text, and response templates for each pattern ##
+    # Regex patterns to match in the text, and response templates for each pattern ##
     # Use (?:) for creating a non-capturing group that will not be reflected back in the reply.
     def eliise_rules(self) -> Eliise_Rules:
         return {10:     {'sarnane(.*)':
@@ -61,7 +65,7 @@ class ESTDecompBrain:
                         r'ka (?:selline|taoline)\b(.*)':
                                 ['=sarnane(.*)']},
                     5:  {'mäletan(.*)':
-                                [rf'{self.think_verb_flag}Kas sa mõtled tihti {0}?', # alternatively a tuple # Maybe check out if estnlk has a solution for this. But heuristics fine. Some sort of syntactic parsing or tagging in estnlk. Something to check whether the object is a noun phrase or a subordinate clause
+                                [rf'{self.elative_flag}Kas sa mõtled tihti {0}?', # alternatively a tuple # Maybe check out if estnlk has a solution for this. But heuristics fine. Some sort of syntactic parsing or tagging in estnlk. Something to check whether the object is a noun phrase or a subordinate clause
                                 'Kas midagi tuleb veel mõttesse, kui sa mõtled {0}?',
                                 'Mis sul veel meelde tuleb?',
                                 'Mis sulle praeguses olukorras meenutab {0}?',
@@ -89,6 +93,13 @@ class ESTDecompBrain:
                                 'Kas sa näed tihti unenägusid?',
                                 'Millised inimesed sinu unenägudes on?',
                                 'Kas sa ei leia, et see unenägu on kuidagi sinu murega seotud?']},
+                    2:  {rf'{self.memory_flag}\b(?:minu|mu)\b(.*)':
+                                [f'={self.memory_responses_key}'],
+                        rf'\b(?:minu|mu)\b.*({self._family_synons_regex()})(.*)': # 2 captured groups! 
+                                ['Räägi mulle veel oma perekonnast.',
+                                'Kes su perekonnas veel {1}?',
+                                'Sinu {0}.',
+                                'Mis sul veel mõttesse tuleb, kui sa mõtled oma {0}?']},
                     0:  {'vabandust(.*)':
                                 ['Palun ära vabanda.',
                                 'Vabandada pole vaja.',
@@ -131,9 +142,7 @@ class ESTDecompBrain:
                                 'Kas sa oled selliseid küsimusi varem küsinud?',
                                 'Kas sa oled kelleltki veel küsinud?'],
                         rf'\bmi{self._mis_regex}\b(.*)':
-                                ['=__mis__'],
-                        rf'{self.memory_flag}\b(?:minu|mu)\b(.*)':
-                                [f'={self.memory_responses_key}']},
+                                ['=__mis__']},
                     -1: {f'{self.match_all_key}': 
                                 ['Ma pole kindel, kas ma mõistan täielikult, mida sa öelda tahad.',
                                 'Palun jätka.',
@@ -149,5 +158,6 @@ class ESTDecompBrain:
 if __name__ == "__main__":
     decomp_brain = ESTDecompBrain()
     #print(decomp_brain.ordered_ranks())
-    print(decomp_brain.eliise_rules())
+    #print(decomp_brain.eliise_rules())
+    print(decomp_brain.family_synons_regex())
 
