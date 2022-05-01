@@ -43,9 +43,6 @@ class ESTDecompBrain:
         synons = ['uskumus', r'\busk\b','tunnen', 'mõtlen', 'arvan', 'usun', 'soovin'] # But not 'tahan' (want), it has its own set of rules
         return rf'(?:{"|".join(synons)})'
 
-    def _sad_synons_regex(str) -> str:
-        synons = ['kurb', 'depressiivne'] # TODO: lisa veel
-
     ## Interface
     def ordered_ranks(self) -> List[int]:
         return sorted(self.eliise_rules().keys(), reverse = True)
@@ -68,8 +65,8 @@ class ESTDecompBrain:
                                 ['Nimed mind ei huvita.',
                                 'Ma juba ütlesin, et nimed mind ei huvita – palun jätka.']},
                 10:     {'sarnane(.*)':
-                                ['Mil moel sarnane?', 'Mismoodi?',
-                                'Milles sarnasus seisneb?', 'Millist sarnasust sa siin näed?',
+                                ['Milles sarnasus seisneb?', 'Mismoodi?', 'Mil moel sarnane?',
+                                'Millist sarnasust sa siin näed?',
                                 'Millele see sarnasus sinu arvates viitab?',
                                 'Kas sul tulevad veel mingid seosed pähe?',
                                 'Mida see sarnasus sinu arvates tähendada võiks?',
@@ -90,7 +87,7 @@ class ESTDecompBrain:
                                 ['=sarnane(.*)'],
                         r'ka (?:selline|taoline)\b(.*)':
                                 ['=sarnane(.*)']},
-                    5:  {'mäletan(.*)':
+                5:      {'mäletan(.*)':
                                 [rf'{self.elative_flag}Kas sa mõtled tihti {0}?', # alternatively a tuple # Maybe check out if estnlk has a solution for this. But heuristics fine. Some sort of syntactic parsing or tagging in estnlk. Something to check whether the object is a noun phrase or a subordinate clause
                                 'Kas midagi tuleb veel mõttesse, kui sa mõtled {0}?',
                                 'Mis sul veel meelde tuleb?',
@@ -102,12 +99,12 @@ class ESTDecompBrain:
                                 'Mis sellest {0}?',
                                 '=__mis__',
                                 'Sa mainisid {0}']},
-                    4:  {'nägin unes(.*)':
+                4:      {'nägin unes(.*)':
                                 ['Tõesti, {0}?',
                                 'Kas sa oled kunagi ärkvel olles fantaseerinud {0}?',
                                 'Kas sa oled varem unes näinud {0}?',
                                 '=__unenägu__']},
-                    3:  {r'\bkui\b(.*)':
+                3:      {r'\bkui\b(.*)':
                                 ['Kas sa pead tõenäoliseks, et {0}?',
                                 'Kas sa soovid, et {0}?',
                                 'Mida sina sellest arvad, kui {0}?',
@@ -119,7 +116,7 @@ class ESTDecompBrain:
                                 'Kas sa näed tihti unenägusid?',
                                 'Millised inimesed sinu unenägudes on?',
                                 'Kas sa ei leia, et see unenägu on kuidagi sinu murega seotud?']},
-                    2:  {'kas ma olin)(.*)': 
+                2:      {'kas ma olin)(.*)': 
                                 ['Mis siis oleks, kui sa olid {0}?',
                                 'Kas sa arvad, et olid {0}?',
                                 'Kas sa olid {0}',
@@ -153,7 +150,7 @@ class ESTDecompBrain:
                                 'Enne ütlesid sa, et {0}.',
                                 'Aga sinu {0}?',
                                 'Kas sel on midagi pistmist faktiga, et sinu {0}?']},
-                    0:  {'vabandust(.*)':
+                0:      {'vabandust(.*)':
                                 ['Palun ära vabanda.',
                                 'Vabandada pole vaja.',
                                 'Mida sa vabandades tunned?',
@@ -182,7 +179,7 @@ class ESTDecompBrain:
                         'italiano': ['=__võõrkeel__'],
                         'espanol': ['=__võõrkeel__'],
                         '__võõrkeel__': ['Vabandust, aga ma räägin ainult eesti keelt.'],
-                        r'tere|tervitus|tervist|(?:\bterv\b)|(?:\bhei\b)(.*)':
+                        r'tere|tervist|(?:\bhei\b)(.*)':
                                 ['Tere. Palun räägi oma murest.'],
                         r'((?:kas ma olen)|(?:olen ma\b))(.*)':
                                 ['Kas sa usud, et sa oled {0}?',
@@ -190,7 +187,7 @@ class ESTDecompBrain:
                                 'Sa soovid, et ma ütleksin, et sa oled {0}',
                                 'Mida see sulle tähendaks, kui sa oleksid {0}',
                                 '=__mis__'],
-                        r'olen\b(.*)': ['Miks sa ütled "olen"?', 'Ma ei saa sellest aru.'],
+                        #r'olen\b(.*)': ['Miks sa ütled "olen"?', 'Ma ei saa sellest aru.'], can skip this in Estonian
                         r'((?:kas sa oled)|(?:oled sa\b))(.*)':
                                 ['Miks sind huvitab, kas ma olen {0} või mitte?',
                                 'Kas sa eelistaksid, et ma ei oleks {0}?',
@@ -207,14 +204,78 @@ class ESTDecompBrain:
                                 'Kuidas on sinu enda {0}?',
                                 'Kas sulle valmistab muret kellegi teise {0}?',
                                 'Tõesti, minu {0}?'],
-                        '(?:tahan|vajan)(.*)':
+                        r'(?:tahan|vajan)(.*)':
                                 ['Kui sa saaksid {0}, siis mida see sulle tähendaks?',
                                 'Miks sa tahad {0}?',
                                 'Mis siis, kui sa juba õige pea saaksidki {0}?',
                                 'Mis siis, kui sa mitte kunagi ei saa {0}?',
                                 'Mida sulle tähendaks, kui sa saaksid {0}?',
                                 'Kuidas {0} soovimine meie vestlusse puutub?'],
-                        'olen (?:kurb|depressivne)': ['TODO'], # TODO: siin pooleli
+                        'olen.*(kurb|õnnetu|depressivne|haige)(.*)': # 2 captured groups, second likely not used
+                                ['Mul on kahju kuulda, et sa oled {0}?',
+                                'Kas sa arvad, et siin olemine aitab sul mitte olla {0}?',
+                                'Ma usun, et pole meeldiv olla {0}',
+                                'Kas sa selgitaksid, mis juhtus, et sa oled {0}'], # TODO: iffy translation
+                        'olen.*(õnnelik|elevil|rõõmus)(.*)': # 2 captured groups, second likely not used
+                                ['=__õnnelik__'],
+                        '__õnnelik__':
+                                ['Kuidas ma olen aidanud sul olla {0}?',
+                                'Kas teraapia on aidanud sul olla {0}', # TODO: iffy translation
+                                'Miks sa nüüd {0} oled?',
+                                'Kas sa saaksid selgitada, miks sa järsku {0} oled?'],
+                        r'tunnen(?:.*)(paremini|õnnelikult\b)(.*)':
+                                ['Kuidas ma olen aidanud sul tunda end {0}?'],
+                        'rõõmustan(.*)':
+                                ['Kas teraapia on aidanud sul rõõmustada?'],
+                        rf'{self._belief_synons_regex}.*(?:ma|mina)(.*)':
+                                ['Kas sa tõesti usud seda?',
+                                'Aga sa pole kindel, et sa {0}.',
+                                'Kas sa tõesti kahtled, et sa {0}?'],
+                        rf'{self._belief_synons_regex}.*(?:sa|sina)(.*)':
+                                ['=sina'], # TODO: check reference validity!
+                        r'\bolen\b(.*)':
+                                ['Kas sa tulid minu juurde sellepärast, et sa oled {0}?',
+                                'Kui kaua oled sa olnud {0}',
+                                'Kas sa usud, et on normaalne olla {0}',
+                                'Kas sa naudid olla {0}'], # TODO: more idiomatic translation
+                        r'(ma|mina) ei saa(.*)':
+                                ['Kuidas sa tead, et sa ei saa {0}?',
+                                'Kas sa oled proovinud?',
+                                'Võib-olla saaksid sa praegu {0}.',
+                                'Kas sa tõesti tahad olla võimeline {0}?'],
+                        r'ma ei\b(.*)':
+                                ['Kas sa tõesti ei {0}?',
+                                'Miks sa ei {0}?',
+                                'Kas sa soovid olla võimeline {0}',
+                                'Kas see häirib sind?'],
+                        'kas ma tunnen(.*)':
+                                ['Räägi mulle veel sellistest tunnetest.',
+                                'Kas sa tunned tihti {0}?',
+                                'Kas sa naudid seda, kui tunned {0}?',
+                                'Mida sulle {0} tundmine meenutab?'],
+                        r'ma(.*)sind\b.*': # TODO: we want an infinitive flag here?
+                                ['Võib-olla sinu fantaasiates me {0} üksteist.',
+                                'Kas sa tahad mind {0}?',
+                                'Sul tundub olevat vajadus mind {0}',
+                                'Kas sa {0} kedagi kedagi veel?'],
+                        r'(.*\b(ma|mina)\b.*)':
+                                ['Sa ütled {0}',
+                                'Kas sa saaksid täpsustada?',
+                                'Kas sul on mingi eriline põhjus öelda "{0}"',
+                                'See on päris huvitav.'],
+                        '\b(?:sa|sina) oled(.*)':
+                                ['Miks sa arvad, et ma olen {0}?',
+                                'Kas sulle valmistab rõõmu uskuda, et ma olen {0}?',
+                                'Kas sa mõnikord soovid, et sa oleksid {0}',
+                                'Võib-olla sulle meeldiks olla {0}'],
+                        '\b(?:sa|sina)(.*)mind.*':
+                                ['MIks sa arvad, et ma {0} sind?',
+                                'Sulle meeldib arvata, et ma {0} sind – kas pole nii?',
+                                'Miks sa arvad, et ma {0} sind?',
+                                'Tõesti, mina {0} sind?',
+                                'Kas sa tahad uskuda, et ma {0} sind?',
+                                'Oletame, et ma {0} sind – mida see tähendaks?',
+                                'Kas keegi veel usub, et ma {0} sind?'],
                         rf'\bmi{self._decl_00_mis_regex}\b(.*)':
                                 ['=__mis__'],
                         '__mis__':
@@ -227,7 +288,7 @@ class ESTDecompBrain:
                                 'Kui sa seda küsid, siis mis sul mõttesse tuleb?',
                                 'Kas sa oled selliseid küsimusi varem küsinud?',
                                 'Kas sa oled kelleltki veel küsinud?']},
-                    -1: {f'{self.match_all_key}': 
+                -1:     {f'{self.match_all_key}': 
                                 ['Ma pole kindel, kas ma mõistan täielikult, mida sa öelda tahad.',
                                 'Palun jätka.',
                                 'Mida see sinu arvates tähendab?',
