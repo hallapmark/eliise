@@ -86,6 +86,8 @@ class ESTDecompBrain:
                         rf'meenutad mulle(.*)': # note: this is in sg. 2 only as in the original Eliza
                                 ['=sarnane(.*)'],
                         r'ka (?:selline|taoline)\b(.*)':
+                                ['=sarnane(.*)'],
+                        r'\b(?:olema|olen|on|oli)\b.*nagu(.*)': 
                                 ['=sarnane(.*)']},
                 5:      {'mäletan(.*)':
                                 [rf'{self.elative_flag}Kas sa mõtled tihti {0}?', # alternatively a tuple # Maybe check out if estnlk has a solution for this. But heuristics fine. Some sort of syntactic parsing or tagging in estnlk. Something to check whether the object is a noun phrase or a subordinate clause
@@ -149,7 +151,24 @@ class ESTDecompBrain:
                                 ['Räägime lähemalt, miks sinu {0}.', # TODO: that-clause or verb detector needed here as well
                                 'Enne ütlesid sa, et {0}.',
                                 'Aga sinu {0}?',
-                                'Kas sel on midagi pistmist faktiga, et sinu {0}?']},
+                                'Kas sel on midagi pistmist faktiga, et sinu {0}?'],
+                        r'(kõik inimesed|igaüks|mitte keegi|eikeegi).*':
+                                ['=igaüks'],
+                        'igaüks':
+                                ['Tõesti, {0}?',
+                                'Kindlasti mitte {0}?',
+                                'Kas sellega seoses tuleb pähe keegi konkreetne inimene?',
+                                'Kes, näiteks?',
+                                'Kas sa mõtled väga erilisest inimesest?',
+                                'Kes, kui ma võin küsida?',
+                                'Võib-olla keegi eriline?',
+                                'Sa pead silmas konkreetset inimest, kas pole?',
+                                'Mis sa arvad, kellest sa räägid?']},
+                1:      {r'\balati\b': 
+                                ['Kas sa saad tuua spetsiifilise näite?',
+                                'Millal?',
+                                'Millist vahejuhtumit sa silmas pead?',
+                                'Tõesti, alati?']},
                 0:      {'vabandust(.*)':
                                 ['Palun ära vabanda.',
                                 'Vabandada pole vaja.',
@@ -262,7 +281,7 @@ class ESTDecompBrain:
                                 'Kas sa mõnikord soovid, et sa oleksid {0}',
                                 'Võib-olla sulle meeldiks olla {0}'],
                         r'\b(?:sa|sina)(.*)mind.*':
-                                ['MIks sa arvad, et ma {0} sind?',
+                                ['Miks sa arvad, et ma {0} sind?',
                                 'Sulle meeldib arvata, et ma {0} sind – kas pole nii?',
                                 'Miks sa arvad, et ma {0} sind?',
                                 'Tõesti, mina {0} sind?',
@@ -307,7 +326,28 @@ class ESTDecompBrain:
                                 'Mida sina arvad?',
                                 'Kui sa seda küsid, siis mis sul mõttesse tuleb?',
                                 'Kas sa oled selliseid küsimusi varem küsinud?',
-                                'Kas sa oled kelleltki veel küsinud?']},
+                                'Kas sa oled kelleltki veel küsinud?'],
+                        r'\bsest\b':
+                                ['Kas see on tegelik põhjus?',
+                                'Kas mingeid teisi põhjuseid ei tule pähe?',
+                                'Kas sulle tundub, et see põhjus selgitab veel midagi?',
+                                'Mis põhjuseid siin veel olla võib?'],
+                        r'miks (?:sa|sina) ei(.*)': 
+                                ['Kas sa usud, et ma ei {0}',
+                                'Äkki ma omal ajal {0}.',
+                                'Kas sa peaksid ise {0}?',
+                                'Sa tahad, et ma {0}?',
+                                '=__mis__'],
+                        r'miks (?:ma|mina) ei (?:saa|oska)(.*)':
+                                ['Kas sa arvad, et sa peaksid olema võimeline {0}?',
+                                'Kas sa tahad olla võimeline {0}?',
+                                'Kas sa usud, et see aitab sul {0}?',
+                                'Kas sul on mingit aimdust, miks sa ei saa {0}?',
+                                '=__mis__'],
+                        r'\bmiks\b':
+                                ['=__mis__'],
+                        'kõik': # slight deviation from the logic of the original Eliza but this makes more sense in Estonian
+                                ['=igaüks']},
                 -1:     {f'{self.match_all_key}': 
                                 ['Ma pole kindel, kas ma mõistan täielikult, mida sa öelda tahad.',
                                 'Palun jätka.',
