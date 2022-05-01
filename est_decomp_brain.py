@@ -167,13 +167,6 @@ class ESTDecompBrain:
                                 'Kas sa ei võiks olla positiivsem?',
                                 'Sa pole kindel.',
                                 'Kas sa siis ei tea?'],
-                        r'\b(jah+|jaa+)\b(.*)':
-                                ['=__jah__'],
-                        '__jah__':
-                                ['Sa tundud selles päris kindel.',
-                                'Sa oled selles veendunud.',
-                                'Või nii.',
-                                'Ma mõistan.'], 
                         'english': ['=__võõrkeel__'],
                         'francais': ['=__võõrkeel__'],
                         'italiano': ['=__võõrkeel__'],
@@ -263,12 +256,12 @@ class ESTDecompBrain:
                                 'Kas sa saaksid täpsustada?',
                                 'Kas sul on mingi eriline põhjus öelda "{0}"',
                                 'See on päris huvitav.'],
-                        '\b(?:sa|sina) oled(.*)':
+                        r'\b(?:sa|sina) oled(.*)':
                                 ['Miks sa arvad, et ma olen {0}?',
                                 'Kas sulle valmistab rõõmu uskuda, et ma olen {0}?',
                                 'Kas sa mõnikord soovid, et sa oleksid {0}',
                                 'Võib-olla sulle meeldiks olla {0}'],
-                        '\b(?:sa|sina)(.*)mind.*':
+                        r'\b(?:sa|sina)(.*)mind.*':
                                 ['MIks sa arvad, et ma {0} sind?',
                                 'Sulle meeldib arvata, et ma {0} sind – kas pole nii?',
                                 'Miks sa arvad, et ma {0} sind?',
@@ -276,6 +269,33 @@ class ESTDecompBrain:
                                 'Kas sa tahad uskuda, et ma {0} sind?',
                                 'Oletame, et ma {0} sind – mida see tähendaks?',
                                 'Kas keegi veel usub, et ma {0} sind?'],
+                        r'\b(?:sa|sina)\b(.*)':
+                                ['Me rääkisime sinust – mitte minust.',
+                                'Ah nii, mina {0}?',
+                                'Sa ei räägi tegelikult minust – või mis?',
+                                'Millised tunded sind praegu valdavad?'],
+                        r'\b(jah+|jaa+)\b(.*)':
+                                ['=__jah__'],
+                        '__jah__':
+                                ['Sa tundud selles päris kindel.',
+                                'Sa oled selles veendunud.',
+                                'Või nii.',
+                                'Ma mõistan.'],
+                        r'\beip?\b(.*)':
+                                ['Kas sa ütled \"ei\" lihtsalt selleks, et olla negatiivne?',
+                                'Sa oled praegu natuke negatiivne.',
+                                'Miks mitte?',
+                                'Miks \"ei\"?'],
+                        r'kas.*(?:suudad|oskad|oled võimeline)(.*)': # TODO: check disjunction
+                                ['Kas pole nii, et sa usud, et ma suudan {0}?',
+                                '=__mis__',
+                                'Sa tahad, et ma oskaksin {0}.',
+                                'Võib-olla sa tahad ise olla võimeline {0}.'],
+                        r'kas.*(?:suudan|oskan|olen võimeline)(.*)':
+                                ['Kas sa suudad {0} või mitte sõltub rohkem sinust kui minust.',
+                                'Kas sa tahad olla võimeline {0}?',
+                                'Võib-olla sa ei taha {0}',
+                                '=__mis__'],
                         rf'\bmi{self._decl_00_mis_regex}\b(.*)':
                                 ['=__mis__'],
                         '__mis__':
