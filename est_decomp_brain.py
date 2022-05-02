@@ -90,7 +90,7 @@ class ESTDecompBrain:
                         r'\b(?:olema|olen|on|oli)\b.*nagu(.*)': 
                                 ['=sarnane(.*)']},
                 5:      {'mäletan(.*)':
-                                [rf'{self.elative_flag}Kas sa mõtled tihti {0}?', # alternatively a tuple # Maybe check out if estnlk has a solution for this. But heuristics fine. Some sort of syntactic parsing or tagging in estnlk. Something to check whether the object is a noun phrase or a subordinate clause
+                                [f'{self.elative_flag}Kas sa mõtled tihti ' + '{0}?', # alternatively a tuple # Maybe check out if estnlk has a solution for this. But heuristics fine. Some sort of syntactic parsing or tagging in estnlk. Something to check whether the object is a noun phrase or a subordinate clause
                                 'Kas midagi tuleb veel mõttesse, kui sa mõtled {0}?',
                                 'Mis sul veel meelde tuleb?',
                                 'Mis sulle praeguses olukorras meenutab {0}?',
@@ -149,7 +149,7 @@ class ESTDecompBrain:
                                 'Kas sulle on tähtis, et sinu {0}'],
                         f'{self.memory_responses_key}':
                                 ['Räägime lähemalt, miks sinu {0}.', # TODO: that-clause or verb detector needed here as well
-                                'Enne ütlesid sa, et {0}.',
+                                'Enne ütlesid sa, et sinu {0}.',
                                 'Aga sinu {0}?',
                                 'Kas sel on midagi pistmist faktiga, et sinu {0}?'],
                         r'(kõik inimesed|igaüks|mitte keegi|eikeegi).*':
@@ -199,7 +199,6 @@ class ESTDecompBrain:
                                 'Sa soovid, et ma ütleksin, et sa oled {0}',
                                 'Mida see sulle tähendaks, kui sa oleksid {0}',
                                 '=__mis__'],
-                        #r'olen\b(.*)': ['Miks sa ütled "olen"?', 'Ma ei saa sellest aru.'], can skip this in Estonian
                         r'(?:kas sa oled)|(?:oled sa\b)(.*)':
                                 ['Miks sind huvitab, kas ma olen {0} või mitte?',
                                 'Kas sa eelistaksid, et ma ei oleks {0}?',
@@ -207,7 +206,7 @@ class ESTDecompBrain:
                                 'Kas sa mõnikord mõtled, et ma olen {0}',
                                 '=__mis__'],
                         r'(\w+)\s+on\b(.*)': 
-                                ['Kas sa arvasid, et {0} ehk ei ole {1}?', # hmm, could actually use 2 reflections here
+                                ['Kas sa arvasid, et {0} ehk ei ole {1}?', 
                                 'Kas sulle meeldiks, kui {0} ei oleks {1}?',
                                 'Mis siis, kui {0} ei oleks {1}?',
                                 'On võimalik, et {0} on {1}.'],

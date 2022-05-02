@@ -254,6 +254,7 @@ class Eliise:
         message = message.replace('.?', '?')
         message = message.replace('??', '?')
         message = message.replace(' .', '.')
+        message = message.replace('..', '.')
         message = message.replace('.,',',')
         message = message.replace(' ,', ',')
         message = message.replace(' ?', '?')

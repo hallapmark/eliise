@@ -7,7 +7,7 @@ class ESTVerbReflector:
         'n': 'd',  # ind. pres. sg. 1 act. positive -- to -- ind. pres. sg. 2 act. pos.
         'd': 'n',  # And the reverse
         'sin': 'sid', # But not 'sid': 'sin' because sid is ambiguous (sg. 2, pl. 3)
-        'ksin': 'ksid', # but not ksid -> ksin because ksid is ambigous 
+        'ksin': 'ksid', # but not ksid -> ksin because ksid is ambiguous 
     }
 
     def reflect_verbs(self, word_list: List[str]) -> List[str]:
