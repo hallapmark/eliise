@@ -21,40 +21,53 @@ Kasutaja: Alati nad tülitavad mind millegagi. (_They are always bugging me abou
 – Eliise: Kas sa saad tuua spetsiifilise näite? (_Can you think of a specific example?_)
 
 Kasutaja: Noh, mu sõber saatis mind siia. (_Well, my friend sent me here._)
+
 – Eliise: Sinu sõber saatis sind siia (_Your friend sent you here_)
 
 Kasutaja: Ta ütleb, et ma olen enamus ajast õnnetu. (_He says I am unhappy most of the time._)
+
 – Eliise: Mul on kahju kuulda, et sa oled õnnetu. (_I am sorry to hear you are unhappy._)
 
 Kasutaja: See on tõsi. Ma olen õnnetu (_It is true. I am unhappy_)
+
 – Eliise: Kas sa arvad, et siin olemine aitab sul mitte olla õnnetu? (_Do you think coming here will help you not be unhappy?_)
 
 Kasutaja: Mul on vaja abi, niipalju on kindel. (_I need help, that much is certain_)
-– Eliise: Kui sa saaksid abi, siis mida see sulle tähendaks? (_If you received_)
 
-Kasutaja: Äkki õpiksin oma emaga läbi saama.
-– Eliise: Räägi mulle veel oma perekonnast.
+– Eliise: Kui sa saaksid abi, siis mida see sulle tähendaks? (_What would it mean to you if you got help?_)
 
-Kasutaja: Mu ema hoolitseb minu eest.
-– Eliise: Kes su perekonnas veel hoolitseb sinu eest?
+Kasutaja: Äkki õpiksin oma emaga läbi saama. (_Perhaps I could learn to get along with my mother._)
 
-Kasutaja: Minu isa.
-– Eliise: Sinu isa.
+– Eliise: Räägi mulle veel oma perekonnast. (_Tell me more about your family._)
 
-Kasutaja: Sa oled mõnel viisil minu isaga sarnane.
-– Eliise: Milles sarnasus seisneb?
+Kasutaja: Mu ema hoolitseb minu eest. (_My mother takes care of me._)
 
-Kasutaja: Sa oled mitteagressiivne, aga ma arvan, et sa tahad autoriteetne olla.
-– Eliise: Sa ütled ma olen mitteagressiivne
+– Eliise: Kes su perekonnas veel hoolitseb sinu eest? (_Who else in your family takes care of you?_)
 
-Kasutaja: Sa ei vaidle minuga.
-– Eliise: Miks sa arvad, et ma ei vaidle sind?
+Kasutaja: Minu isa. (_My father._)
 
-Kasutaja: Sa kardad mind.
-Eliise: Sulle meeldib arvata, et ma kardan sind – kas pole nii?
+– Eliise: Sinu isa. (_Your father._)
 
-Kasutaja: Mu isa kardab kõiki.
-Eliise: Mis sul veel mõttesse tuleb, kui sa mõtled oma isa?
+Kasutaja: Sa oled mõnel viisil minu isaga sarnane. (_You are like my father in some ways._)
 
-Kasutaja: Kiusajad.
-Eliise: Räägime lähemalt, miks sinu kaaslane saatis sind siia.
+– Eliise: Milles sarnasus seisneb? (_What resemblance do you see?_)
+
+Kasutaja: Sa oled mitteagressiivne, aga ma arvan, et sa tahad autoriteetne olla. (_You are not aggressive but I think you want to be authoritative._)
+
+– Eliise: Sa ütled ma olen mitteagressiivne (_You say I am not aggressive._)
+
+Kasutaja: Sa ei vaidle minuga. (_You don't argue with me._)
+
+– Eliise: Miks sa arvad, et ma ei vaidle sind?** (_Why do you think I don't argue with you?_)
+
+Kasutaja: Sa kardad mind. (_You are afraid of me._)
+
+Eliise: Sulle meeldib arvata, et ma kardan sind – kas pole nii? (_You like to think that I am afraid of you – don't you?_)
+
+Kasutaja: Mu isa kardab kõiki. (_My father is afraid of everyone_)
+
+Eliise: Mis sul veel mõttesse tuleb, kui sa mõtled oma isa? (_What else comes to mind when you think of your father_)
+
+Kasutaja: Kiusajad. (_Bullies_)
+
+Eliise: Räägime lähemalt, miks sinu sõber saatis sind siia. (_Let's discuss further why your friend sent you here_)
