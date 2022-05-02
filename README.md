@@ -58,7 +58,7 @@ User: Sa oled mitteagressiivne, aga ma arvan, et sa tahad autoriteetne olla. (_Y
 
 User: Sa ei vaidle minuga. (_You don't argue with me._)
 
-– Eliise: Miks sa arvad, et ma ei vaidle sind?** (_Why do you think I don't argue with you?_)
+– Eliise: Miks sa arvad, et ma ei vaidle sind? (_Why do you think I don't argue with you?_)
 
 User: Sa kardad mind. (_You are afraid of me._)
 
