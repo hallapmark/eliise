@@ -43,7 +43,7 @@ class Eliise:
         # { pattern: index of response to use for pattern next time }
         self._response_index_for_pattern: Dict[str, int] = {} 
         self._memorized_response_stack: List[str] = []
-        self._amnesiac = False
+        self._rounds_until_memory_allowed = 3
 
     ## Public methods ##
     # Get a response from the chatbot
@@ -60,7 +60,10 @@ class Eliise:
         according to a dictionary of rules."""
         print()
         print(f"User: {message}")
+        print(f'Rounds until memory allowed: {self._rounds_until_memory_allowed}')
         response = self._response_for_message(message, decomp_brain, response_index_for_pattern)
+        self._rounds_until_memory_allowed -= 1
+        print(f'Rounds until memory allowed: {self._rounds_until_memory_allowed}')
         return self._fix_punctuation(response.response)
 
     def _response_for_message(self,
@@ -129,17 +132,15 @@ class Eliise:
     def _memory_handler(self, response: ELResponse):
         self._memorized_response_stack.append(response.response)
         # If we just saved a response to memory, we won't use memory this round.
-        self._amnesiac = True
+        if self._rounds_until_memory_allowed < 1:
+            self._rounds_until_memory_allowed += 1
     
     def _pop_from_memory(self) -> Optional[str]:
         stack = self._memorized_response_stack
-        if self._amnesiac:
-            self._amnesiac = False
+        if self._rounds_until_memory_allowed > 0 or not stack:
             return None
-        if not stack:
-            return None
-        # Get response from memory and prohibit memory use for the next round
-        self._amnesiac = True
+        # Get response from memory and reset memory block counter
+        self._rounds_until_memory_allowed = 3
         return stack.pop(0)
 
     def _elative_verb_handler(self, response: ELResponse):

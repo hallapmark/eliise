@@ -59,7 +59,7 @@ class ESTDecompBrain:
                                 'Kas sa ei arva, et masinad võivad inimesi aidata?',
                                 'Mis sind masinate juures häirib?',
                                 'Mida sa masinatest arvad?'],
-                        rf'masin(?:{self._decl_02_regex_sg}|{self._decl_02_regex_sg})?': 
+                        rf'masin(?:{self._decl_02_regex_sg}|{self._decl_02_regex_pl})?': 
                                 ['=arvuti']},
                 15:     {rf'nim(?:{self._decl_20_regex_sg}|{self._decl_20_regex_pl})\b(.*)': 
                                 ['Nimed mind ei huvita.',
@@ -118,7 +118,7 @@ class ESTDecompBrain:
                                 'Kas sa näed tihti unenägusid?',
                                 'Millised inimesed sinu unenägudes on?',
                                 'Kas sa ei leia, et see unenägu on kuidagi sinu murega seotud?']},
-                2:      {'kas ma olin)(.*)': 
+                2:      {'kas ma olin(.*)': 
                                 ['Mis siis oleks, kui sa olid {0}?',
                                 'Kas sa arvad, et olid {0}?',
                                 'Kas sa olid {0}',
@@ -206,8 +206,8 @@ class ESTDecompBrain:
                                 'Võib-olla ma olen {0} sinu fantaasiates.',
                                 'Kas sa mõnikord mõtled, et ma olen {0}',
                                 '=__mis__'],
-                        r'\bon\b(.*)': 
-                                ['Kas sa arvasid, et nad ehk ei ole {0}?',
+                        r'\b(.*)on\b(.*)': 
+                                ['Kas sa arvasid, et ehk ei ole {0}?', # hmm, could actually use 2 reflections here
                                 'Kas sulle meeldiks, kui nad ei oleks {0}?',
                                 'Mis siis, kui nad ei oleks {0}?',
                                 'On võimalik, et nad on {0}.'],
@@ -293,7 +293,7 @@ class ESTDecompBrain:
                                 'Ah nii, mina {0}?',
                                 'Sa ei räägi tegelikult minust – või mis?',
                                 'Millised tunded sind praegu valdavad?'],
-                        r'\b(jah+|jaa+)\b(.*)':
+                        r'\b(jah+|jaa+|jajah)\b(.*)':
                                 ['=__jah__'],
                         '__jah__':
                                 ['Sa tundud selles päris kindel.',
