@@ -8,7 +8,7 @@ Eliise juturobot: an Estonian implementation of the famous English-language Eliz
 4) Make sure you have the [estnlk](https://github.com/estnltk/estnltk) natural language processing library installed. If you created the conda environment described in step 3 and have it activated, then you can install the library with the command `conda install -c estnltk -c conda-forge estnltk=1.7.0rc0`. Note: this is a large library with its own dependencies. If you run into any trouble with the installation, follow the [instructions](https://github.com/estnltk/estnltk) in the library documents.
 
 ### Use
-In your terminal, navigate to the folder where you cloned Eliise. If you are using conda, remember to check that you have the environment described above activated. Then run `python eliise_cmdl_interface.py`. Eliise will greet you, and you can now have a chat. When you want to finish the conversation, type 'quit' or 'sulge' and press enter.
+In your terminal, navigate to the folder where you cloned Eliise. If you are using conda, remember to check that you have the environment described above activated. Then run `python eliise_cmdl_interface.py`. Eliise will greet you, and you can now have a chat. When you want to finish the conversation, type `quit` or `sulge` and press enter.
 
 Eliise is a (mostly) deterministic bot that follows the logic of the original English-language chatbot very closely. Here is a recreation of the dialogue from the 1966 paper:
 
