@@ -58,7 +58,7 @@ User: Sa oled mitteagressiivne, aga ma arvan, et sa tahad autoriteetne olla. (_Y
 
 User: Sa ei vaidle minuga. (_You don't argue with me._)
 
-– Eliise: Miks sa arvad, et ma ei vaidle sind? (_Why do you think I don't argue with you?_)
+– Eliise: Miks sa arvad, et ma ei vaidle sind?* (_Why do you think I don't argue with you?_)
 
 User: Sa kardad mind. (_You are afraid of me._)
 
@@ -66,8 +66,10 @@ Eliise: Sulle meeldib arvata, et ma kardan sind – kas pole nii? (_You like to 
 
 User: Mu isa kardab kõiki. (_My father is afraid of everyone_)
 
-Eliise: Mis sul veel mõttesse tuleb, kui sa mõtled oma isa? (_What else comes to mind when you think of your father_)
+Eliise: Mis sul veel mõttesse tuleb, kui sa mõtled oma isa?* (_What else comes to mind when you think of your father_)
 
 User: Kiusajad. (_Bullies_)
 
 Eliise: Räägime lähemalt, miks sinu sõber saatis sind siia. (_Let's discuss further why your friend sent you here_)
+
+* marks sentences where the current version of Eliise struggles with finding correct declensions for nouns when reflecting back something that the user has said.
