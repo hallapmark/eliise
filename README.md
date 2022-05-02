@@ -15,6 +15,7 @@ Eliise is a (mostly) deterministic bot that follows the logic of the original En
 Kasutaja: Kõik sõbrad on samasugused.    All my friends are alike
 Eliise: Mil viisil samasugused?
 
+
 Kasutaja: Alati nad tülitavad mind millegagi.
 Eliise: Kas sa saad tuua spetsiifilise näite?
 
