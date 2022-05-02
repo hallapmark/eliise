@@ -1,5 +1,5 @@
 # eliise
-Eliise juturobot: an Estonian implementation of the famous English-language Eliza chatbot. See the 1966 paper by Joseph Weizenbaum introducing the original chatbot [here](https://dl.acm.o rg/doi/10.1145/365153.365168).
+Eliise juturobot: an Estonian implementation of the famous English-language Eliza chatbot. See the 1966 paper by Joseph Weizenbaum introducing the original chatbot [here](https://dl.acm.org/doi/10.1145/365153.365168).
 
 ### Installation
 1) It is recommended to have [conda](https://www.anaconda.com/products/distribution) for this project. 
