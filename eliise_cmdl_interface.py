@@ -34,12 +34,11 @@ if __name__ == "__main__":
         except EOFError:
             s = 'quit'
 
-eliise = Eliise(ESTDecompBrain(),
-                ESTTokenizer(),
-                ESTVerbReflector(),
-                ESTPronounReflector(),
-                ESTContentTrimmer())
-
+# eliise = Eliise(ESTDecompBrain(),
+#                 ESTTokenizer(),
+#                 ESTVerbReflector(),
+#                 ESTPronounReflector(),
+#                 ESTContentTrimmer())
 # send_cmdline_message(eliise, "Kõik sõbrad on samasugused.")
 # send_cmdline_message(eliise, "Alati nad tülitavad mind millegagi.")
 # send_cmdline_message(eliise, "Noh, mu sõber saatis mind siia.")
