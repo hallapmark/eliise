@@ -35,9 +35,11 @@ class ESTDecompBrain:
     
     ## Equivalence classes/synonyms
     def _family_synons_regex(self) -> str:
-        # TODO: add recognition for all cases? 
-        synons = ['perekond', 'ema', 'emme', 'mamps', 'mamma', 'isa', 'paps', 'õde', 'vend', 'abikaasa', 'lapsed', 'laps']
-        return rf'(?:{"|".join(synons)})'
+        # TODO: this can be expanded to add recognition for all cases
+        synons = ['perekond', 'ema', 'emaga', 'emme', 'mamps', 'mamma', 'isa', 'isaga', 'paps', 'õde', 'õega', 'vend', 'abikaasa', 'lapsed', 'laps']
+        synon_str = "|".join(synons)
+        synon_str = rf'(?:{synon_str})'
+        return synon_str 
 
     def _belief_synons_regex(self) -> str:
         synons = ['uskumus', r'\busk\b','tunnen', 'mõtlen', 'arvan', 'usun', 'soovin'] # But not 'tahan' (want), it has its own set of rules
@@ -82,7 +84,7 @@ class ESTDecompBrain:
                                 ['Mil viisil samasugune?', '=sarnane(.*)'],
                         rf'(?:\bsamad\b|samasugu{self._decl_10_ne_regex_pl})\b(.*)':
                                 ['Mil viisil samasugused?',
-                                '=sarnased(.*)'], # TODO: re-test the sg and pl variants       
+                                '=sarnased(.*)'],    
                         rf'meenutad mulle(.*)': # note: this is in sg. 2 only as in the original Eliza
                                 ['=sarnane(.*)'],
                         r'ka (?:selline|taoline)\b(.*)':
@@ -90,7 +92,7 @@ class ESTDecompBrain:
                         r'\b(?:olema|olen|on|oli)\b.*nagu(.*)': 
                                 ['=sarnane(.*)']},
                 5:      {'mäletan(.*)':
-                                [f'{self.elative_flag}Kas sa mõtled tihti ' + '{0}?', # alternatively a tuple # Maybe check out if estnlk has a solution for this. But heuristics fine. Some sort of syntactic parsing or tagging in estnlk. Something to check whether the object is a noun phrase or a subordinate clause
+                                ['Kas sa mõtled tihti ' + '{0}?', # alternatively a tuple # Maybe check out if estnlk has a solution for this. But heuristics fine. Some sort of syntactic parsing or tagging in estnlk. Something to check whether the object is a noun phrase or a subordinate clause
                                 'Kas midagi tuleb veel mõttesse, kui sa mõtled {0}?',
                                 'Mis sul veel meelde tuleb?',
                                 'Mis sulle praeguses olukorras meenutab {0}?',
@@ -137,13 +139,13 @@ class ESTDecompBrain:
                                 'Mis siis oleks, kui ma olin {0}'],
                         rf'{self.memory_flag}\b(?:minu|mu)\b(.*)':
                                 [f'={self.memory_responses_key}'],
-                        rf'\b(?:minu|mu)\b.*({self._family_synons_regex()})(.*)': # 2 captured groups! 
+                        rf'\b(?:minu|mu|oma)\b.*({self._family_synons_regex()})(.*)': # 2 captured groups! 
                                 ['Räägi mulle veel oma perekonnast.',
                                 'Kes su perekonnas veel {1}?',
                                 'Sinu {0}.',
                                 'Mis sul veel mõttesse tuleb, kui sa mõtled oma {0}?'],
-                        rf'{self.check_verb_in_reflection_flag}\b(?:minu|mu)\b(.*)': # TODO: that-clause detector would be good here. Or maybe a verb detector?
-                                ['Sinu {0}?',
+                        rf'\b(?:minu|mu)\b(.*)': # TODO: that-clause detector would be good here. Or maybe a verb detector?
+                                ['Sinu {0}',
                                 'Miks sa ütled – sinu {0}',
                                 'Kas see vihjab veel millelegi sinule kuuluvale?',
                                 'Kas sulle on tähtis, et sinu {0}'],
@@ -205,33 +207,28 @@ class ESTDecompBrain:
                                 'Võib-olla ma olen {0} sinu fantaasiates.',
                                 'Kas sa mõnikord mõtled, et ma olen {0}',
                                 '=__mis__'],
-                        r'(\w+)\s+on\b(.*)': 
-                                ['Kas sa arvasid, et {0} ehk ei ole {1}?', 
-                                'Kas sulle meeldiks, kui {0} ei oleks {1}?',
-                                'Mis siis, kui {0} ei oleks {1}?',
-                                'On võimalik, et {0} on {1}.'],
                         r'sinu\b(.*)':
                                 ['Miks sind huvitab minu {0}?',
                                 'Kuidas on sinu enda {0}?',
                                 'Kas sulle valmistab muret kellegi teise {0}?',
                                 'Tõesti, minu {0}?'],
-                        r'(?:tahan|vajan)(.*)':
+                        r'(?:tahan|vajan|on vaja)(.*)':
                                 ['Kui sa saaksid {0}, siis mida see sulle tähendaks?',
                                 'Miks sa tahad {0}?',
                                 'Mis siis, kui sa juba õige pea saaksidki {0}?',
                                 'Mis siis, kui sa mitte kunagi ei saa {0}?',
                                 'Mida sulle tähendaks, kui sa saaksid {0}?',
                                 'Kuidas {0} soovimine meie vestlusse puutub?'],
-                        'olen.*(kurb|õnnetu|depressivne|haige)(.*)': # 2 captured groups, second likely not used
-                                ['Mul on kahju kuulda, et sa oled {0}?',
+                        'olen.*(kurb|õnnetu|depressivne|haige)(.*)': # 2 captured groups, second unused for now
+                                ['Mul on kahju kuulda, et sa oled {0}.',
                                 'Kas sa arvad, et siin olemine aitab sul mitte olla {0}?',
-                                'Ma usun, et pole meeldiv olla {0}',
-                                'Kas sa selgitaksid, mis juhtus, et sa oled {0}'], # TODO: iffy translation
-                        'olen.*(õnnelik|elevil|rõõmus)(.*)': # 2 captured groups, second likely not used
+                                'Ma usun, et pole meeldiv olla {0}.',
+                                'Kas sa selgitaksid, mis juhtus, et sa oled {0}?'],
+                        'olen.*(õnnelik|elevil|rõõmus)(.*)': # 2 captured groups, second unused for now
                                 ['=__õnnelik__'],
                         '__õnnelik__':
                                 ['Kuidas ma olen aidanud sul olla {0}?',
-                                'Kas teraapia on aidanud sul olla {0}', # TODO: iffy translation
+                                'Kas teraapia on aidanud sul olla {0}', 
                                 'Miks sa nüüd {0} oled?',
                                 'Kas sa saaksid selgitada, miks sa järsku {0} oled?'],
                         r'tunnen(?:.*)(paremini|õnnelikult\b)(.*)':
@@ -243,7 +240,7 @@ class ESTDecompBrain:
                                 'Aga sa pole kindel, et sa {0}.',
                                 'Kas sa tõesti kahtled, et sa {0}?'],
                         rf'{self._belief_synons_regex}.*\b(?:sa|sina)\b(.*)':
-                                ['=sina'], # TODO: check reference validity!
+                                ['=__sinaoled__'], 
                         r'\bolen\b(.*)':
                                 ['Kas sa tulid minu juurde sellepärast, et sa oled {0}?',
                                 'Kui kaua oled sa olnud {0}',
@@ -275,14 +272,15 @@ class ESTDecompBrain:
                                 'Kas sul on mingi eriline põhjus öelda "{0}"',
                                 'See on päris huvitav.'],
                         r'\b(?:sa|sina) oled(.*)':
+                                ['=__sinaoled__'],
+                        '__sinaoled__': 
                                 ['Miks sa arvad, et ma olen {0}?',
                                 'Kas sulle valmistab rõõmu uskuda, et ma olen {0}?',
                                 'Kas sa mõnikord soovid, et sa oleksid {0}',
                                 'Võib-olla sulle meeldiks olla {0}'],
-                        r'\b(?:sa|sina)\b(.*)mind.*':
+                        r'\b(?:sa|sina)\b(.*)(?:mind|minuga).*':
                                 ['Miks sa arvad, et ma {0} sind?',
                                 'Sulle meeldib arvata, et ma {0} sind – kas pole nii?',
-                                'Miks sa arvad, et ma {0} sind?',
                                 'Tõesti, mina {0} sind?',
                                 'Kas sa tahad uskuda, et ma {0} sind?',
                                 'Oletame, et ma {0} sind – mida see tähendaks?',
@@ -346,7 +344,12 @@ class ESTDecompBrain:
                         r'\bmiks\b':
                                 ['=__mis__'],
                         'kõik': # slight deviation from the logic of the original Eliza but this makes more sense in Estonian
-                                ['=igaüks']},
+                                ['=igaüks'],
+                        r'(\w+)\s+on\b(.*)': 
+                                ['Kas sa arvasid, et {0} ehk ei ole {1}?', 
+                                'Kas sulle meeldiks, kui {0} ei oleks {1}?',
+                                'Mis siis, kui {0} ei oleks {1}?',
+                                'On võimalik, et {0} on {1}.']},
                 -1:     {f'{self.match_all_key}': 
                                 ['Ma pole kindel, kas ma mõistan täielikult, mida sa öelda tahad.',
                                 'Palun jätka.',

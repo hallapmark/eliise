@@ -19,9 +19,17 @@ class ESTContentTrimmer:
                 continue
             previous_cl = all_clauses[i-1]
             # If it's the second clause and we have the connective ", et" we keep the second clause
-            if i == 1 and previous_cl.endswith(",") and True in [next_cl.find(x) for x in [" et", "et"]]:
-                clauses_to_reflect.append(next_cl)
-            elif len(previous_cl) < 7: # ~1 word. 
+            # TODO: This can probably be simplified
+            if i == 1:
+                if previous_cl.endswith(",") and True in [next_cl.find(x) for x in [" et", "et"]]:
+                    clauses_to_reflect.append(next_cl)
+                if len(all_clauses) > 2:
+                    next_next_cl = all_clauses[i+1]
+                    if next_cl == "," and True in [next_next_cl.find(x) for x in [" et", "et"]]:
+                        clauses_to_reflect.append(next_cl)
+                    else:
+                        break
+            elif len(previous_cl) < 3: # ~minimal word. 
                 # This also weeds out false splits e.g. abbreviations with a dot in them.
                 clauses_to_reflect.append(next_cl)
             else:

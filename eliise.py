@@ -58,12 +58,8 @@ class Eliise:
                    response_index_for_pattern: Dict[str, int]) -> str:
         """ Create a response by transforming the user's input message 
         according to a dictionary of rules."""
-        print()
-        print(f"User: {message}")
-        print(f'Rounds until memory allowed: {self._rounds_until_memory_allowed}')
         response = self._response_for_message(message, decomp_brain, response_index_for_pattern)
         self._rounds_until_memory_allowed -= 1
-        print(f'Rounds until memory allowed: {self._rounds_until_memory_allowed}')
         return self._fix_punctuation(response.response)
 
     def _response_for_message(self,
@@ -93,7 +89,6 @@ class Eliise:
                 continue
             # This response does not get used now, it gets stored in memory to be used later
             if response.decomp_options and self._memory_handler in response.decomp_options:
-                print("Memory handler runs!")
                 self._memory_handler(response)
                 continue
             return response
@@ -111,14 +106,13 @@ class Eliise:
         match = re.search(decomp_pattern, message, re.IGNORECASE)
         if not match:
             return None
-        print("Match:", match)
         if pattern == decomp_brain.match_all_key:
             memorized_response = self._pop_from_memory()
             if memorized_response:
-                return ELResponse(memorized_response, match, None, None) # TODO: Check that last None
+                return ELResponse(memorized_response, match, None, None) 
         response_str = self._next_response_for_pattern(decomp_pattern, responses, decomp_brain, response_index_for_pattern)
-        print("Response template:", response_str)
-        print("Pattern:", decomp_pattern)
+        if decomp_options and self._memory_handler in decomp_options and decomp_pattern in self._response_index_for_pattern:
+            self._response_index_for_pattern[decomp_pattern] -=1
         response = ELResponse(response_str, match, decomp_options, None)
         if not response_str.startswith("="):
             return self._reflect_content(response)
@@ -190,7 +184,6 @@ class Eliise:
         """ This function looks for a response template based on a known key/pattern.
         This enables cross-referencing between patterns. E.g. response n of pattern A might
         be '=B' which is short for 'go pick a response from a related pattern B')"""
-        print("redir!")
         for rank in decomp_brain.ordered_ranks():
             rules = decomp_brain.eliise_rules().get(rank)
             if rules and key in rules:
@@ -227,7 +220,6 @@ class Eliise:
         try:
             captured_content = match.group(group_number)
         except IndexError:
-            print("indexerror") # TODO: get rid of print statement
             return None
             # We will get this error if we have indicated in our recomposition 
             # rule that we expect to reflect something in the content, but the 
@@ -238,12 +230,10 @@ class Eliise:
                 return captured_content
             # In some scenarios (e.g. in regex patterns including |) it is possible to get None
             # even if there was no error from Match.group().
-            print("No captured content!")
             return None
             
 
     def _processed_reflection(self, captured_content: str) -> str:
-        print(f'captured content:{captured_content}')
         content_to_reflect = self._content_trimmer.shortened_content_to_reflect(captured_content)
         words = self._tokenizer.tokenized(content_to_reflect)
         reflection = self._pronoun_reflector.reflect_pronouns(words)
