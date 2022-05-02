@@ -200,17 +200,17 @@ class ESTDecompBrain:
                                 'Mida see sulle tähendaks, kui sa oleksid {0}',
                                 '=__mis__'],
                         #r'olen\b(.*)': ['Miks sa ütled "olen"?', 'Ma ei saa sellest aru.'], can skip this in Estonian
-                        r'((?:kas sa oled)|(?:oled sa\b))(.*)':
+                        r'(?:kas sa oled)|(?:oled sa\b)(.*)':
                                 ['Miks sind huvitab, kas ma olen {0} või mitte?',
                                 'Kas sa eelistaksid, et ma ei oleks {0}?',
                                 'Võib-olla ma olen {0} sinu fantaasiates.',
                                 'Kas sa mõnikord mõtled, et ma olen {0}',
                                 '=__mis__'],
-                        r'\b(.*)on\b(.*)': 
-                                ['Kas sa arvasid, et ehk ei ole {0}?', # hmm, could actually use 2 reflections here
-                                'Kas sulle meeldiks, kui nad ei oleks {0}?',
-                                'Mis siis, kui nad ei oleks {0}?',
-                                'On võimalik, et nad on {0}.'],
+                        r'(\w+)\s+on\b(.*)': 
+                                ['Kas sa arvasid, et {0} ehk ei ole {1}?', # hmm, could actually use 2 reflections here
+                                'Kas sulle meeldiks, kui {0} ei oleks {1}?',
+                                'Mis siis, kui {0} ei oleks {1}?',
+                                'On võimalik, et {0} on {1}.'],
                         r'sinu\b(.*)':
                                 ['Miks sind huvitab minu {0}?',
                                 'Kuidas on sinu enda {0}?',

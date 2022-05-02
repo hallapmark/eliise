@@ -203,7 +203,7 @@ class Eliise:
     def _reflect_content(self, response: ELResponse) -> ELResponse:
         if not response.match:
             return response
-        processed_reflection = ""
+        processed_reflections: List[str] = []
         for i in range(2): # The maximum number of captured groups in the user's message is 2
             reflect_flag = f'{{{i}}}' # e.g. 'Why do you {0}?'
             if reflect_flag not in response.response:
@@ -211,14 +211,16 @@ class Eliise:
             captured_content = self._captured_group_content(response.match, i+1)
             if not captured_content:
                 continue
-            processed_reflection = self._processed_reflection(captured_content)
-            # And for any given response template, we only ever define one captured group 
-            # to use. So if we found a match, stop looking for another one
-            break
-        if processed_reflection == "":
+            processed_reflections.append(self._processed_reflection(captured_content))
+        if not processed_reflections:
             return response
-        response.response = re.sub(r'{[0-9]}',"{0}", response.response)
-        response.response = response.response.format(processed_reflection)
+        #for i, reflection in enumerate(processed_reflections):
+        if len(processed_reflections) == 1:
+            response.response = re.sub(r'{[0-9]}',"{0}", response.response)
+            response.response = response.response.format(processed_reflections[0])
+        elif len(processed_reflections) == 2:
+            response.response = response.response.format(processed_reflections[0], processed_reflections[1])
+        # We don't allow more than 2 reflections in a single response
         return response
     
     def _captured_group_content(self, match: Match, group_number: int) -> Optional[str]:
