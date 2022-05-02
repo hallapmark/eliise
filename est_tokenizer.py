@@ -12,3 +12,4 @@ if __name__ == "__main__":
     tokenizer = ESTTokenizer()
     test = tokenizer.tokenized("Karu jooksis sookollide eest pakku.")
     print(test)
+    

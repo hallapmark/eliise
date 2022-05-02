@@ -40,3 +40,4 @@ class ELReflectedContentTrimmer(Protocol):
 class ELDefaultVerbReflector:
     def reflect_verbs(self, word_list: List[str]) -> List[str]: 
         return word_list
+        

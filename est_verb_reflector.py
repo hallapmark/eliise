@@ -35,4 +35,3 @@ class ESTVerbReflector:
             else:
                 new_words.append(word_obj['text'])
         return new_words
-
