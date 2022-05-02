@@ -41,4 +41,5 @@ class ESTPronounReflector:
 
     def reflect_pronouns(self, word_list: List[str]) -> List[str]:
         d = self.PRONOUN_REFLECTIONS
+        word_list = [word.lower() for word in word_list]
         return [(d[word] if word in d else word) for word in word_list]

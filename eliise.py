@@ -243,6 +243,7 @@ class Eliise:
             
 
     def _processed_reflection(self, captured_content: str) -> str:
+        print(f'captured content:{captured_content}')
         content_to_reflect = self._content_trimmer.shortened_content_to_reflect(captured_content)
         words = self._tokenizer.tokenized(content_to_reflect)
         reflection = self._pronoun_reflector.reflect_pronouns(words)

@@ -21,7 +21,7 @@ class ESTContentTrimmer:
             # If it's the second clause and we have the connective ", et" we keep the second clause
             if i == 1 and previous_cl.endswith(",") and True in [next_cl.find(x) for x in [" et", "et"]]:
                 clauses_to_reflect.append(next_cl)
-            elif len(previous_cl) < 9: # ~2 words. 
+            elif len(previous_cl) < 7: # ~1 word. 
                 # This also weeds out false splits e.g. abbreviations with a dot in them.
                 clauses_to_reflect.append(next_cl)
             else:

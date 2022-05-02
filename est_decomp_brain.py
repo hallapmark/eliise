@@ -78,9 +78,9 @@ class ESTDecompBrain:
                                 'Kas sul tulevad veel mingid seosed pähe?'],
                         rf'sarna{self._decl_10_ne_regex_sg}(.*)': 
                                 ['=sarnane(.*)'], 
-                        rf'(?:\bsama\b|samasugu{self._decl_10_ne_regex_sg})(.*)':
+                        rf'(?:\bsama\b|samasugu{self._decl_10_ne_regex_sg})\b(.*)':
                                 ['Mil viisil samasugune?', '=sarnane(.*)'],
-                        rf'(?:\bsamad\b|samasugu{self._decl_10_ne_regex_pl})(.*)':
+                        rf'(?:\bsamad\b|samasugu{self._decl_10_ne_regex_pl})\b(.*)':
                                 ['Mil viisil samasugused?',
                                 '=sarnased(.*)'], # TODO: re-test the sg and pl variants       
                         rf'meenutad mulle(.*)': # note: this is in sg. 2 only as in the original Eliza
@@ -238,11 +238,11 @@ class ESTDecompBrain:
                                 ['Kuidas ma olen aidanud sul tunda end {0}?'],
                         'rõõmustan(.*)':
                                 ['Kas teraapia on aidanud sul rõõmustada?'],
-                        rf'{self._belief_synons_regex}.*(?:ma|mina)(.*)':
+                        rf'{self._belief_synons_regex}.*\b(?:ma|mina)\b(.*)':
                                 ['Kas sa tõesti usud seda?',
                                 'Aga sa pole kindel, et sa {0}.',
                                 'Kas sa tõesti kahtled, et sa {0}?'],
-                        rf'{self._belief_synons_regex}.*(?:sa|sina)(.*)':
+                        rf'{self._belief_synons_regex}.*\b(?:sa|sina)\b(.*)':
                                 ['=sina'], # TODO: check reference validity!
                         r'\bolen\b(.*)':
                                 ['Kas sa tulid minu juurde sellepärast, et sa oled {0}?',
@@ -279,7 +279,7 @@ class ESTDecompBrain:
                                 'Kas sulle valmistab rõõmu uskuda, et ma olen {0}?',
                                 'Kas sa mõnikord soovid, et sa oleksid {0}',
                                 'Võib-olla sulle meeldiks olla {0}'],
-                        r'\b(?:sa|sina)(.*)mind.*':
+                        r'\b(?:sa|sina)\b(.*)mind.*':
                                 ['Miks sa arvad, et ma {0} sind?',
                                 'Sulle meeldib arvata, et ma {0} sind – kas pole nii?',
                                 'Miks sa arvad, et ma {0} sind?',
