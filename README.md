@@ -12,62 +12,62 @@ In your terminal, navigate to the folder where you cloned Eliise. If you are usi
 
 Eliise is a (mostly) deterministic bot that follows the logic of the original English-language chatbot very closely. Here is a recreation of the dialogue from the 1966 paper:
 
-Kasutaja: Kõik sõbrad on samasugused. (_All friends are alike_)
+User: Kõik sõbrad on samasugused. (_All friends are alike_)
 
 – Eliise: Mil viisil samasugused? (_Alike in what way?_)
 
-Kasutaja: Alati nad tülitavad mind millegagi. (_They are always bugging me about something._)
+User: Alati nad tülitavad mind millegagi. (_They are always bugging me about something._)
 
 – Eliise: Kas sa saad tuua spetsiifilise näite? (_Can you think of a specific example?_)
 
-Kasutaja: Noh, mu sõber saatis mind siia. (_Well, my friend sent me here._)
+User: Noh, mu sõber saatis mind siia. (_Well, my friend sent me here._)
 
 – Eliise: Sinu sõber saatis sind siia (_Your friend sent you here_)
 
-Kasutaja: Ta ütleb, et ma olen enamus ajast õnnetu. (_He says I am unhappy most of the time._)
+User: Ta ütleb, et ma olen enamus ajast õnnetu. (_He says I am unhappy most of the time._)
 
 – Eliise: Mul on kahju kuulda, et sa oled õnnetu. (_I am sorry to hear you are unhappy._)
 
-Kasutaja: See on tõsi. Ma olen õnnetu (_It is true. I am unhappy_)
+User: See on tõsi. Ma olen õnnetu (_It is true. I am unhappy_)
 
 – Eliise: Kas sa arvad, et siin olemine aitab sul mitte olla õnnetu? (_Do you think coming here will help you not be unhappy?_)
 
-Kasutaja: Mul on vaja abi, niipalju on kindel. (_I need help, that much is certain_)
+User: Mul on vaja abi, niipalju on kindel. (_I need help, that much is certain_)
 
 – Eliise: Kui sa saaksid abi, siis mida see sulle tähendaks? (_What would it mean to you if you got help?_)
 
-Kasutaja: Äkki õpiksin oma emaga läbi saama. (_Perhaps I could learn to get along with my mother._)
+User: Äkki õpiksin oma emaga läbi saama. (_Perhaps I could learn to get along with my mother._)
 
 – Eliise: Räägi mulle veel oma perekonnast. (_Tell me more about your family._)
 
-Kasutaja: Mu ema hoolitseb minu eest. (_My mother takes care of me._)
+User: Mu ema hoolitseb minu eest. (_My mother takes care of me._)
 
 – Eliise: Kes su perekonnas veel hoolitseb sinu eest? (_Who else in your family takes care of you?_)
 
-Kasutaja: Minu isa. (_My father._)
+User: Minu isa. (_My father._)
 
 – Eliise: Sinu isa. (_Your father._)
 
-Kasutaja: Sa oled mõnel viisil minu isaga sarnane. (_You are like my father in some ways._)
+User: Sa oled mõnel viisil minu isaga sarnane. (_You are like my father in some ways._)
 
 – Eliise: Milles sarnasus seisneb? (_What resemblance do you see?_)
 
-Kasutaja: Sa oled mitteagressiivne, aga ma arvan, et sa tahad autoriteetne olla. (_You are not aggressive but I think you want to be authoritative._)
+User: Sa oled mitteagressiivne, aga ma arvan, et sa tahad autoriteetne olla. (_You are not aggressive but I think you want to be authoritative._)
 
 – Eliise: Sa ütled ma olen mitteagressiivne (_You say I am not aggressive._)
 
-Kasutaja: Sa ei vaidle minuga. (_You don't argue with me._)
+User: Sa ei vaidle minuga. (_You don't argue with me._)
 
 – Eliise: Miks sa arvad, et ma ei vaidle sind?** (_Why do you think I don't argue with you?_)
 
-Kasutaja: Sa kardad mind. (_You are afraid of me._)
+User: Sa kardad mind. (_You are afraid of me._)
 
 Eliise: Sulle meeldib arvata, et ma kardan sind – kas pole nii? (_You like to think that I am afraid of you – don't you?_)
 
-Kasutaja: Mu isa kardab kõiki. (_My father is afraid of everyone_)
+User: Mu isa kardab kõiki. (_My father is afraid of everyone_)
 
 Eliise: Mis sul veel mõttesse tuleb, kui sa mõtled oma isa? (_What else comes to mind when you think of your father_)
 
-Kasutaja: Kiusajad. (_Bullies_)
+User: Kiusajad. (_Bullies_)
 
 Eliise: Räägime lähemalt, miks sinu sõber saatis sind siia. (_Let's discuss further why your friend sent you here_)
