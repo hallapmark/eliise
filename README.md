@@ -10,44 +10,44 @@ Eliise juturobot: an Estonian implementation of the famous English-language Eliz
 ### Use
 In your terminal, navigate to the folder where you cloned Eliise. If you are using conda, remember to check that you have the environment described above activated. Then run `python eliise_cmdl_interface.py`. Eliise will greet you, and you can now have a chat. When you want to finish the conversation, type 'quit' or 'sulge' and press enter.
 
-Eliise is a (mostly) deterministic bot that follows the logic of the original English-language chatbot very closely. Here is a recreation of the dialogue from the 1966 paper:
+Eliise is a (mostly) deterministic bot that follows the logic of the original English-language chatbot very closely. Here is a loose recreation of the dialogue from the 1966 paper:
 
-Kasutaja: Kõik sõbrad on samasugused.    All my friends are alike
-Eliise: Mil viisil samasugused?
+Kasutaja: Kõik sõbrad on samasugused. (_All my friends are alike_)
 
+– Eliise: Mil viisil samasugused? 
 
-Kasutaja: Alati nad tülitavad mind millegagi.
-Eliise: Kas sa saad tuua spetsiifilise näite?
+Kasutaja: Alati nad tülitavad mind millegagi. 
+– Eliise: Kas sa saad tuua spetsiifilise näite?
 
 Kasutaja: Noh, mu kaaslane saatis mind siia.
-Eliise: Sinu kaaslane saatis sind siia
+– Eliise: Sinu kaaslane saatis sind siia
 
 Kasutaja: Ta ütleb, et ma olen enamus ajast õnnetu.
-Eliise: Mul on kahju kuulda, et sa oled õnnetu.
+– Eliise: Mul on kahju kuulda, et sa oled õnnetu.
 
 Kasutaja: See on tõsi. Ma olen õnnetu
-Eliise: Kas sa arvad, et siin olemine aitab sul mitte olla õnnetu?
+– Eliise: Kas sa arvad, et siin olemine aitab sul mitte olla õnnetu?
 
 Kasutaja: Mul on vaja abi, niipalju on kindel.
-Eliise: Kui sa saaksid abi, siis mida see sulle tähendaks?
+– Eliise: Kui sa saaksid abi, siis mida see sulle tähendaks?
 
 Kasutaja: Äkki õpiksin oma emaga läbi saama.
-Eliise: Räägi mulle veel oma perekonnast.
+– Eliise: Räägi mulle veel oma perekonnast.
 
 Kasutaja: Mu ema hoolitseb minu eest.
-Eliise: Kes su perekonnas veel hoolitseb sinu eest?
+– Eliise: Kes su perekonnas veel hoolitseb sinu eest?
 
 Kasutaja: Minu isa.
-Eliise: Sinu isa.
+– Eliise: Sinu isa.
 
 Kasutaja: Sa oled mõnel viisil minu isaga sarnane.
-Eliise: Milles sarnasus seisneb?
+– Eliise: Milles sarnasus seisneb?
 
 Kasutaja: Sa oled mitteagressiivne, aga ma arvan, et sa tahad autoriteetne olla.
-Eliise: Sa ütled ma olen mitteagressiivne
+– Eliise: Sa ütled ma olen mitteagressiivne
 
 Kasutaja: Sa ei vaidle minuga.
-Eliise: Miks sa arvad, et ma ei vaidle sind?
+– Eliise: Miks sa arvad, et ma ei vaidle sind?
 
 Kasutaja: Sa kardad mind.
 Eliise: Sulle meeldib arvata, et ma kardan sind – kas pole nii?
