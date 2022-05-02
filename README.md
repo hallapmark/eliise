@@ -72,4 +72,4 @@ User: Kiusajad. (_Bullies_)
 
 Eliise: Räägime lähemalt, miks sinu sõber saatis sind siia. (_Let's discuss further why your friend sent you here_)
 
-* marks sentences where the current version of Eliise struggles with finding correct declensions for nouns when reflecting back something that the user has said.
+a * marks sentences where the current version of Eliise struggles with finding correct declensions for nouns when reflecting back something that the user has said.
