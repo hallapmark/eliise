@@ -267,7 +267,7 @@ class ESTDecompBrain:
                                 'Sul tundub olevat vajadus mind {0}',
                                 'Kas sa {0} kedagi kedagi veel?'],
                         r'(.*\b(ma|mina)\b.*)':
-                                ['Sa ütled {0}',
+                                ['Sa ütled – {0}',
                                 'Kas sa saaksid täpsustada?',
                                 'Kas sul on mingi eriline põhjus öelda "{0}"',
                                 'See on päris huvitav.'],

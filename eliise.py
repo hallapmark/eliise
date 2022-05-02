@@ -127,7 +127,7 @@ class Eliise:
         self._memorized_response_stack.append(response.response)
         # If we just saved a response to memory, we won't use memory this round.
         if self._rounds_until_memory_allowed < 1:
-            self._rounds_until_memory_allowed += 1
+            self._rounds_until_memory_allowed = 1
     
     def _pop_from_memory(self) -> Optional[str]:
         stack = self._memorized_response_stack
